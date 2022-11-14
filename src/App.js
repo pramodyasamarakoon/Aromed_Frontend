@@ -1,23 +1,82 @@
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import LandingPage from './Pages/LandingPage'
+import OrderMedicine from './Pages/Customer/OrderMedicinePage'
+import VideoConference from "./Pages/Customer/VideoConferencePage";
+import MeetDoctor from "./Pages/Customer/MeetDoctor";
+import ForgotPassword01 from "./Pages/Customer/ForgotPassword01";
+import ForgotPassword02 from "./Pages/Customer/ForgotPassword02";
+import LaboratoryFees from "./Pages/Customer/LaboratoryFees";
+import PayByCard from "./Pages/Customer/PayByCard";
+import AppointmentConfirmation from "./Pages/Customer/AppointmentConfirmation";
+import WaitingForAppointment from "./Pages/Customer/WaitingForAppointment";
+import MyTurnAppointment from "./Pages/Customer/MyTurnAppointment";
+import BeforeLoginAppointment from "./Pages/Customer/BeforeLoginAppointment";
+import SuccessfulOrderRequest from "./Pages/Customer/OrderMedicineProcess/SuccessfulOrderRequest";
+import OrderProcessing from "./Pages/Customer/OrderMedicineProcess/OrderProcessing";
+import CompletedOrder from "./Pages/Customer/OrderMedicineProcess/CompletedOrder";
+import OrderSuccessful from "./Pages/Customer/OrderMedicineProcess/OrderSuccessfull";
+import ReceptionistHome from "./Pages/OtherPages/Receptionist/HomePage";
+import ReceptionistLab from "./Pages/OtherPages/Receptionist/Lab";
+import PharmacistHome from "./Pages/OtherPages/Pharmacist/PharmacistHome";
+import DoctorHome from "./Pages/OtherPages/Doctor/DoctorHome";
+import DoctorAvailability from "./Pages/OtherPages/Doctor/DoctorAvailability";
+import DoctorMeeting from "./Pages/OtherPages/Doctor/DoctorMeeting";
+import AdminHome from "./Pages/OtherPages/Admin/AdminHome";
+import AdminCharges from "./Pages/OtherPages/Admin/AdminCharges";
+import AccountPage from "./Pages/OtherPages/AccountPage";
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Router>
+        <Routes>
+          {/* Customer */}
+          {/* Error */}
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/orderMedicine" element={<OrderMedicine />} />
+          <Route path="/videoConference" element={<VideoConference />} />
+          <Route path="/meetDoctor" element={<MeetDoctor />} />
+          <Route path="/LaboratoryFees" element={<LaboratoryFees />} />
+          {/* Fine */}
+          <Route path="/ForgotPassword01" element={<ForgotPassword01 />} />
+          <Route path="/ForgotPassword02" element={<ForgotPassword02 />} />
+          <Route path="/PayByCard" element={<PayByCard />} />
+          <Route
+            path="/AppointmentConfirmation"
+            element={<AppointmentConfirmation />}
+          />
+          <Route
+            path="/WaitingForAppointment"
+            element={<WaitingForAppointment />}
+          />
+          <Route path="/MyTurnAppointment" element={<MyTurnAppointment />} />
+          <Route
+            path="/BeforeLoginAppointment"
+            element={<BeforeLoginAppointment />}
+          />
+          <Route
+            path="/SuccessfulOrderRequest"
+            element={<SuccessfulOrderRequest />}
+          />
+          <Route path="/OrderProcessing" element={<OrderProcessing />} />
+          <Route path="/CompletedOrder" element={<CompletedOrder />} />
+          <Route path="/OrderSuccessful" element={<OrderSuccessful />} />
+          {/* Receptionist */}
+          <Route path="/ReceptionistHome" element={<ReceptionistHome />} />
+          <Route path="/ReceptionistLab" element={<ReceptionistLab />} />
+          {/* Pharmacist */}
+          <Route path="/PharmacistHome" element={<PharmacistHome />} />
+          {/* Doctor */}
+          <Route path="/DoctorHome" element={<DoctorHome />} />
+          <Route path="/DoctorAvailability" element={<DoctorAvailability />} />
+          <Route path="/DoctorMeeting" element={<DoctorMeeting />} />
+          {/* Admin */}
+          <Route path="/AdminHome" element={<AdminHome />} />
+          <Route path="/AdminCharges" element={<AdminCharges />} />
+          {/* Account Page */}
+          <Route path="/AccountPage" element={<AccountPage />} />
+        </Routes>
+      </Router>
     </div>
   );
 }
