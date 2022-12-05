@@ -5,6 +5,9 @@ import Button from "../../../components/MainButton";
 import Footer from "../../../Lib/Footer";
 import NavBar from "../../../Lib/NavBar";
 
+import axios, * as others from 'axios';
+
+
 function VideoConference() {
   const [name, setName] = useState('');
   const [mNumber, setMNumber] = useState();
@@ -16,6 +19,8 @@ function VideoConference() {
   const [doctor, setDoctor] = useState();
   const [date, setDate] = useState();
   const [message, setMessage] = useState();
+  const [snackBar, setSnackBar] = useState(false);
+  const videoConference = true;
   // const data = {
   //   name: '',
   //   mNumber: null,
@@ -29,8 +34,28 @@ function VideoConference() {
   //   message: ''
   //   }
 
-    function onSubmit() {
-      window.alert('Data Successfully Saved')
+    const onSubmit = async () => {
+      // window.alert('Data Successfully Saved')
+      setSnackBar(true);
+      let res = await axios.post('http://localhost:8080/customer/videoConference', {
+        name: name,
+        mNumber: mNumber,
+        email: email,
+        address: address,
+        gender: gender,
+        age: age,
+        nic: nic,
+        doctor: doctor,
+        date: date,
+        message: message,
+        videoConference: videoConference
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
     }
 
   return (
@@ -70,7 +95,7 @@ function VideoConference() {
           </p>
           <div className="flex justify-center pt-4 ">
             <p className="px-4">Or you can meet a doctor</p>
-            <Link to="/meetDoctor">
+            <Link to="/customer/meetDoctor">
               <button
                 className="p-4 py-0 rounded-lg bg-light-blue "
                 type="button"
@@ -221,6 +246,19 @@ function VideoConference() {
               <Button value="Pay By Card" />
             </Link>
           </div>
+        </div>
+      </div>
+      <div>
+        <div className="text-white px-6 py-4 border-0 rounded relative mb-4 bg-gray-500">
+          <span className="text-xl inline-block mr-5 align-middle">
+            <i className="fas fa-bell" />
+          </span>
+          <span className="inline-block align-middle mr-8">
+            <b className="capitalize">gray!</b> This is a gray alert - check it out!
+          </span>
+          <button className="absolute bg-transparent text-2xl font-semibold leading-none right-0 top-0 mt-4 mr-6 outline-none focus:outline-none">
+            <span>×</span>
+          </button>
         </div>
       </div>
       <Footer />

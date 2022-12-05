@@ -75,7 +75,7 @@ function AdminHome() {
       <div id="1" className="max-w-[1240px] mx-auto mt-[150px] ">
         <HeaderBox header="User Accounts" />
         {/* Filtering the date */}
-        <div className="bg-box-blue/30 flex px-20 py-12 justify-center ">
+        <div className="bg-box-blue/30 flex px-20 py-4 justify-center ">
           <input className="w-[60%]" type="text" placeholder="Search by Name" />
 
           <Button value="Search" />
@@ -83,10 +83,10 @@ function AdminHome() {
 
         {/* Appointments Table */}
         {/* Inner box */}
-        <div className="bg-box-blue/30 mt-12 py-12 px-32 ">
-          <div className="w-full mx-auto pt-24 pb-16 px-8 my-8 bg-white font-bold rounded-xl ">
+        <div className="bg-box-blue/30 mt-4 py-4 px-32 ">
+          <div className="w-full mx-auto pt-4 pb-8 px-8 my-4 bg-white font-bold rounded-xl ">
             {/* Bill items */}
-            <div className="pb-16   ">
+            <div className="pb-8   ">
               <table className="table-auto w-full border-collapse border border-slate-500 ">
                 <thead>
                   <th className=" border border-slate-600 bg-slate-400 ">

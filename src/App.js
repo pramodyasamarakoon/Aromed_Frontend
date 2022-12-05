@@ -34,8 +34,8 @@ function App() {
           {/* Error */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/orderMedicine" element={<OrderMedicine />} />
-          <Route path="/videoConference" element={<VideoConference />} />
-          <Route path="/meetDoctor" element={<MeetDoctor />} />
+          <Route path="/customer/videoConference" element={<VideoConference />} />
+          <Route path="/customer/meetDoctor" element={<MeetDoctor />} />
           <Route path="/LaboratoryFees" element={<LaboratoryFees />} />
           {/* Fine */}
           <Route path="/ForgotPassword01" element={<ForgotPassword01 />} />

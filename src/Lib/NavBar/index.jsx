@@ -35,7 +35,7 @@ function NavBar() {
           </ul>
         </div>
 
-        <Link to="/videoConference">
+        <Link to="/customer/videoConference">
           <Button value="Book Now" />
         </Link>
       </div>

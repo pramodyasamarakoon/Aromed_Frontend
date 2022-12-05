@@ -30,7 +30,7 @@
   }
 
   td {
-    @apply p-2 text-center text-black;
+    @apply px-2 py-1 text-center text-black;
   }
 
   tr {

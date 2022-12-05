@@ -66,8 +66,9 @@ const DOCTOR_CARDS_DETAILS = [
 
 // Check Appointment ID
 const checkAppointment = async (ID,e) => {
-  e.preventDefault();
+  // e.preventDefault("");
   let appointmentID = ID;
+  
   if(appointmentID != undefined){
     window.alert(appointmentID);
     const isValid = await landingPageValidation.isValid(appointmentID);
@@ -75,6 +76,8 @@ const checkAppointment = async (ID,e) => {
   }
  
 }
+
+
 
 function LandingPage() {
   const [ id, setId] = useState();
@@ -100,7 +103,7 @@ function LandingPage() {
                 onChange={(e) => {setId(e.target.value)}}
                 value={id}
               />
-              <Button value='check' />
+              <Button onClick={ checkAppointment } value='check' />
             </form>
           </div>
         </div>

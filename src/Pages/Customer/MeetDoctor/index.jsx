@@ -5,6 +5,8 @@ import Button from "../../../components/MainButton";
 import Footer from "../../../Lib/Footer";
 import NavBar from "../../../Lib/NavBar";
 
+import axios, * as others from 'axios';
+
 function MeetDoctor() {
   const [name, setName] = useState('');
   const [mNumber, setMNumber] = useState();
@@ -16,9 +18,31 @@ function MeetDoctor() {
   const [doctor, setDoctor] = useState();
   const [date, setDate] = useState();
   const [message, setMessage] = useState();
+  const [snackBar, setSnackBar] = useState(false);
+  const videoConference = false;
 
-  function onSubmit() {
+  const onSubmit = async () => {
     window.alert('Data Successfully Saved')
+    setSnackBar(true);
+      let res = await axios.post('http://localhost:8080/customer/videoConference', {
+        name: name,
+        mNumber: mNumber,
+        email: email,
+        address: address,
+        gender: gender,
+        age: age,
+        nic: nic,
+        doctor: doctor,
+        date: date,
+        message: message,
+        videoConference: videoConference
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
   return (
@@ -59,7 +83,7 @@ function MeetDoctor() {
             </p>
             <div className="flex justify-center pt-4 ">
               <p className="px-4">Or you can arrange video conference</p>
-              <Link to="/videoConference">
+              <Link to="/customer/videoConference">
                 <button
                   className="p-4 py-0 rounded-lg bg-light-blue "
                   type="button"
