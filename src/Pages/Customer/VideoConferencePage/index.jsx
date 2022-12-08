@@ -218,7 +218,12 @@ function VideoConference() {
                 }
               />
             </div>
-            <Button extraTailwind='flex justify-center' onClick={ onSubmit }  value="Submit" />
+            <Link to="/PayByCard">
+              <Button extraTailwind='flex justify-center'
+              // onClick={ onSubmit } 
+              value="Submit" />
+            </Link>
+            
           </div>
         </div>
 

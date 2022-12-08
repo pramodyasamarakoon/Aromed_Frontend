@@ -16,7 +16,7 @@ function SuccessfulOrderRequest() {
         </div>
 
         {/* Successful Message */}
-        <HeaderBox extraTailwind="my-4" header="Order Medicine" />
+        <HeaderBox extraTailwind="my-4" header="Order Medicine" backPath="SuccessfulOrderRequest" />
         <div className="flex justify-center py-8 ">
           <div className="flex flex-col justify-center p-4">
             <Icon icon="charm:circle-tick" color="#4ecb71" width="36" />

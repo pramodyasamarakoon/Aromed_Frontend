@@ -45,6 +45,7 @@ function App() {
             path="/AppointmentConfirmation"
             element={<AppointmentConfirmation />}
           />
+          
           <Route
             path="/WaitingForAppointment"
             element={<WaitingForAppointment />}
@@ -54,6 +55,7 @@ function App() {
             path="/BeforeLoginAppointment"
             element={<BeforeLoginAppointment />}
           />
+
           <Route
             path="/SuccessfulOrderRequest"
             element={<SuccessfulOrderRequest />}

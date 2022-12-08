@@ -89,7 +89,7 @@ function ReceptionistHome() {
                   <li className="Active">Appointments</li>
                 </Link>
                 <Link to="/ReceptionistLab">
-                  <li>Availability</li>
+                  <li>Laboratory</li>
                 </Link>
               </ul>
             </div>

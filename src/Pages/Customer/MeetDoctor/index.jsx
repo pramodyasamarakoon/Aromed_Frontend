@@ -20,9 +20,14 @@ function MeetDoctor() {
   const [message, setMessage] = useState();
   const [snackBar, setSnackBar] = useState(false);
   const videoConference = false;
+  // const [data, setData] = useState();
+  const [billHandler, setBillHandler] = useState(false)
+  const [paymentStatus, setPaymentStatus] = useState(true)
+  const [tempAppointmentId, setTempAppointmentId] = useState()
+  const [data, setData] = useState()
 
   const onSubmit = async () => {
-    window.alert('Data Successfully Saved')
+    // window.alert('Data Successfully Saved')
     setSnackBar(true);
       let res = await axios.post('http://localhost:8080/customer/videoConference', {
         name: name,
@@ -38,11 +43,40 @@ function MeetDoctor() {
         videoConference: videoConference
       })
       .then(function (response) {
-        console.log(response);
+        // console.log(response);
+        setData(response)
+        if(response.status === 201 ){
+          console.log(response.data.appointmentId);
+          setBillHandler(true);
+        }
       })
       .catch(function (error) {
-        console.log(error);
-      });
+        // console.log(error);
+      });   
+  }
+
+  const bookAnAppointment = async () => {
+    let res = await axios.post('http://localhost:8080/customer/meetAppointment', {
+        appointmentId: tempAppointmentId,
+        paymentStatus: false,
+      })
+      .then(function (response) {
+        // console.log(response);
+        setData(response)
+        // if(response.status === 201 ){
+        //   console.log("Succesfull");
+        // }
+      })
+      .catch(function (error) {
+        // console.log(error);
+      });  
+    // if ( tempAppointmentId === data.data.appointmentId ){
+    //   setPaymentStatus(false);
+    //   // console.log(paymentStatus);
+    // }
+    // else{
+    //   console.log(paymentStatus);
+    // }
   }
 
   return (
@@ -215,11 +249,12 @@ function MeetDoctor() {
           </div>
 
           {/* Bill */}
-          <div className="w-full h-auto py-20 my-12 bg-box-blue/20 ">
+          { billHandler === true ? 
+            <div className="w-full h-auto py-10 my-5 bg-box-blue/20">
             {/* Bill inner box */}
-            <div className="w-[340px] mx-auto pt-24 pb-16 px-8 bg-white font-bold rounded-xl ">
+            <div className="w-[340px] mx-auto py-10 px-8 bg-white font-bold rounded-xl ">
               {/* Bill items */}
-              <div className="pb-16 border-b border-slate-500  ">
+              <div className="pb-10 border-b border-slate-500  ">
                 <div className="flex justify-between ">
                   <p className="text-black">Appointment Fee</p>
                   <p className="text-black">600.00</p>
@@ -230,13 +265,30 @@ function MeetDoctor() {
                 </div>
               </div>
               {/* Bill total */}
-              <div className="flex justify-between pt-4 pb-12 font-semi-bold text-xl ">
+              <div className="flex justify-between pt-4 pb-4 font-semi-bold text-xl ">
                 <p className="text-black">Total</p>
                 <p className="text-lime-500">2300.00</p>
               </div>
-              <Button value="Pay on Door" />
+              <div className="w-full flex-col justify-between md:my-2 pb-2 ">
+                <p className="text-black font-semibold pb-2" >Check Your E mail and Please Enter the Appointment ID Here</p>
+                <input
+                  name="appointmentId"
+                  type="text"
+                  placeholder="Appointment ID"
+                  className="w-full md:w-[100%]"
+                  onChange={(e) =>
+                    {setTempAppointmentId(e.target.value)}
+                  }
+                />
+              </div>
+              <Button 
+              onClick={bookAnAppointment} 
+              value="Pay on Door" />
             </div>
           </div>
+          : null
+          }
+          
         </div>
         <Footer />
       </div>

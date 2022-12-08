@@ -54,9 +54,11 @@ function OrderMedicine() {
                   { setOrderID(e.target.value) }
                 }
               />
-              {/* <Link to={`${props.linkTo}`}> */}
-                <Button value='Check' onClick={ onSubmitID } extraTailwind="p-4" />
-              {/* </Link> */}
+              <Link to="/OrderProcessing">
+                <Button value='Check' 
+                // onClick={ onSubmitID } 
+                extraTailwind="p-4" />
+              </Link>
             </form>
           </div>
         </div>
@@ -150,9 +152,11 @@ function OrderMedicine() {
                 />
               </div>
               <div className="py-2">
-                {/* <Link to="/SuccessfulOrderRequest"> */}
-                  <Button onClick={onSubmit} value="Request" />
-                {/* </Link> */}
+                <Link to="/SuccessfulOrderRequest">
+                  <Button 
+                  // onClick={onSubmit} 
+                  value="Request" />
+                </Link>
               </div>
             </div>
           </div>

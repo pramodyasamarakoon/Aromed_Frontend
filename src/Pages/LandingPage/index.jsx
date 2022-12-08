@@ -103,7 +103,13 @@ function LandingPage() {
                 onChange={(e) => {setId(e.target.value)}}
                 value={id}
               />
-              <Button onClick={ checkAppointment } value='check' />
+              <Link to="/WaitingForAppointment">
+                <Button 
+                // onClick={ checkAppointment } 
+                value='check' />
+              </Link>
+              
+              
             </form>
           </div>
         </div>
@@ -163,7 +169,7 @@ function LandingPage() {
             <ServiceBox
               icon="fontisto:doctor"
               topic="Meet a Doctor"
-              path="videoConference"
+              path="customer/videoConference"
               // eslint-disable-next-line
               text="You can book an appointment Here. There are two options you have. You can meet a doctor physically or vertually."
             />
