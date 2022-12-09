@@ -5,11 +5,10 @@ import Button from "../../../components/MainButton";
 import Footer from "../../../Lib/Footer";
 import NavBar from "../../../Lib/NavBar";
 
-import axios, * as others from 'axios';
-
+import axios, * as others from "axios";
 
 function VideoConference() {
-  const [name, setName] = useState('');
+  const [name, setName] = useState("");
   const [mNumber, setMNumber] = useState();
   const [email, setEmail] = useState();
   const [address, setAddress] = useState();
@@ -34,10 +33,11 @@ function VideoConference() {
   //   message: ''
   //   }
 
-    const onSubmit = async () => {
-      // window.alert('Data Successfully Saved')
-      setSnackBar(true);
-      let res = await axios.post('http://localhost:8080/customer/videoConference', {
+  const onSubmit = async () => {
+    // window.alert('Data Successfully Saved')
+    setSnackBar(true);
+    let res = await axios
+      .post("http://localhost:8080/customer/videoConference", {
         name: name,
         mNumber: mNumber,
         email: email,
@@ -48,7 +48,7 @@ function VideoConference() {
         doctor: doctor,
         date: date,
         message: message,
-        videoConference: videoConference
+        videoConference: videoConference,
       })
       .then(function (response) {
         console.log(response);
@@ -56,7 +56,7 @@ function VideoConference() {
       .catch(function (error) {
         console.log(error);
       });
-    }
+  };
 
   return (
     <div className="bg-back-blue">
@@ -113,12 +113,12 @@ function VideoConference() {
             <div className="w-full md:flex justify-between md:my-2 ">
               <input
                 type="text"
-                name='name'
+                name="name"
                 placeholder="Name"
                 className="w-full md:w-[49%]"
-                onChange={(e) =>
-                  {setName(e.target.value)}
-                }
+                onChange={(e) => {
+                  setName(e.target.value);
+                }}
               />
               <input
                 type="number"
@@ -126,19 +126,20 @@ function VideoConference() {
                 id=""
                 placeholder="Mobile Number"
                 className="w-full md:w-[49%] "
-                onChange={(e)=>
-                {setMNumber(e.target.value)}}
+                onChange={(e) => {
+                  setMNumber(e.target.value);
+                }}
               />
             </div>
             <div className="w-full md:flex justify-between md:my-2">
               <input
                 type="email"
-                name='email'
+                name="email"
                 placeholder="E mail"
                 className="md:w-[49%] "
-                onChange={ (e) =>
-                  { setEmail(e.target.value) }
-                }
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                }}
               />
               <input
                 type="text"
@@ -146,19 +147,19 @@ function VideoConference() {
                 id=""
                 placeholder="Address"
                 className="md:w-[49%] "
-                onChange={ (e) =>
-                  { setAddress(e.target.value) }
-                }
+                onChange={(e) => {
+                  setAddress(e.target.value);
+                }}
               />
             </div>
             <div className="w-full md:flex justify-between md:my-2 ">
               <select
                 name="gender"
                 className="w-full md:w-[49%]"
-                onChange={ (e) =>
-                  { setGender(e.target.value) }
-                }
-                >
+                onChange={(e) => {
+                  setGender(e.target.value);
+                }}
+              >
                 <option value="gender">Select Gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
@@ -169,9 +170,9 @@ function VideoConference() {
                 id=""
                 placeholder="Age"
                 className="w-full md:w-[49%] "
-                onChange={ (e) =>
-                  { setAge(e.target.value) }
-                }
+                onChange={(e) => {
+                  setAge(e.target.value);
+                }}
               />
             </div>
             <div className="w-full md:flex justify-between md:my-2 ">
@@ -180,19 +181,19 @@ function VideoConference() {
                 type="text"
                 placeholder="NIC Number"
                 className="w-full md:w-[49%] "
-                onChange={ (e) =>
-                  { setNic(e.target.value) }
-                }
+                onChange={(e) => {
+                  setNic(e.target.value);
+                }}
               />
               <select
                 name="doctor"
                 className="w-full md:w-[49%] "
-                onChange={ (e) =>
-                  { setDoctor(e.target.value) }
-                }
+                onChange={(e) => {
+                  setDoctor(e.target.value);
+                }}
               >
                 <option value="doctor">Select Doctor</option>
-                 <option value="doc01">Doc01</option>
+                <option value="doc01">Doc01</option>
                 <option value="doc02">Doc02</option>
               </select>
             </div>
@@ -202,9 +203,9 @@ function VideoConference() {
                 name="date"
                 placeholder="Select a Date"
                 className="md:w-[49%] "
-                onChange={ (e) =>
-                  { setDate(e.target.value) }
-                }
+                onChange={(e) => {
+                  setDate(e.target.value);
+                }}
               />
             </div>
             <div className="w-full md:my-2 pb-4">
@@ -213,17 +214,18 @@ function VideoConference() {
                 name="message"
                 placeholder="If Any Message?"
                 className="w-full "
-                onChange={ (e) =>
-                  { setMessage(e.target.value) }
-                }
+                onChange={(e) => {
+                  setMessage(e.target.value);
+                }}
               />
             </div>
             <Link to="/PayByCard">
-              <Button extraTailwind='flex justify-center'
-              // onClick={ onSubmit } 
-              value="Submit" />
+              <Button
+                extraTailwind="flex justify-center"
+                // onClick={ onSubmit }
+                value="Submit"
+              />
             </Link>
-            
           </div>
         </div>
 
@@ -259,7 +261,8 @@ function VideoConference() {
             <i className="fas fa-bell" />
           </span>
           <span className="inline-block align-middle mr-8">
-            <b className="capitalize">gray!</b> This is a gray alert - check it out!
+            <b className="capitalize">gray!</b> This is a gray alert - check it
+            out!
           </span>
           <button className="absolute bg-transparent text-2xl font-semibold leading-none right-0 top-0 mt-4 mr-6 outline-none focus:outline-none">
             <span>×</span>
