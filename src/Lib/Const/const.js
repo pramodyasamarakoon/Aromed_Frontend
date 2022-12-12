@@ -16,3 +16,14 @@ export const doctors = [
         charge: 1400
     },
 ]
+
+export const deliveryChargers = [
+    {
+        name: "In District",
+        charge: 350,
+    },
+    {
+        name: "Out District",
+        charge: 500,
+    }
+]
