@@ -3,7 +3,9 @@ import { Link } from "react-router-dom";
 import NavBar from "../../Lib/NavBar";
 import Hero from "../../Lib/Hero";
 import HeaderBox from "../../components/HeaderBox";
-import Button from "../../components/MainButton";
+// import Button from "../../components/MainButton";
+// import { Button } from "@material-ui/core";
+import Button from "@mui/material/Button";
 import ServiceBox from "../../components/ServiceBox";
 import ServiceBoxSmall from "../../components/ServiceBoxSmall";
 import DoctorCard from "../../components/DoctorCard";
@@ -17,6 +19,8 @@ import DoctorMeet from "../../assets/DoctorMeet.jpg";
 import VideoCall from "../../assets/VideoCall.jpg";
 import Footer from "../../Lib/Footer";
 import { landingPageValidation } from "../../Validations/LandingPageV";
+import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
+import { Grid } from "@mui/material";
 
 /* Data for the doctor */
 const DOCTOR_CARDS_DETAILS = [
@@ -65,22 +69,19 @@ const DOCTOR_CARDS_DETAILS = [
 ];
 
 // Check Appointment ID
-const checkAppointment = async (ID,e) => {
+const checkAppointment = async (ID, e) => {
   // e.preventDefault("");
   let appointmentID = ID;
-  
-  if(appointmentID != undefined){
+
+  if (appointmentID != undefined) {
     window.alert(appointmentID);
     const isValid = await landingPageValidation.isValid(appointmentID);
     // window.alert(isValid)
   }
- 
-}
-
-
+};
 
 function LandingPage() {
-  const [ id, setId] = useState();
+  const [id, setId] = useState();
 
   return (
     <div className="bg-back-blue ">
@@ -89,13 +90,15 @@ function LandingPage() {
       <Hero />
 
       {/* Check Your Appointment */}
-      <div className="max-w-[1240px] mx-auto ">
+      <div className="max-w-[1000px] mx-auto ">
         <HeaderBox header="Check Your Appointment" />
         <div>
-          <p className={` p-4 pt-0 `}>Do you want to check about your previous order? You can enter your
-          Appointment ID and get updated about your order.</p>
-          <div className="bg-box-blue/30">
-            <form onSubmit={(event) => {checkAppointment(id, event)}} className="md:flex w-[80%] m-auto py-8 ">
+          <p className={` p-4 pt-0 `}>
+            Do you want to check about your previous order? You can enter your
+            Appointment ID and get updated about your order.
+          </p>
+          <div className="bg-white">
+            {/* <form onSubmit={(event) => {checkAppointment(id, event)}} className="md:flex w-[80%] m-auto py-8 ">
               <input
                 className="w-full mb-4 md:mb-0 mr-4  "
                 type="text"
@@ -110,7 +113,66 @@ function LandingPage() {
               </Link>
               
               
-            </form>
+            </form> */}
+            <ValidatorForm
+              className="md:flex w-[80%] m-auto py-4 "
+              onSubmit={(event) => {
+                checkAppointment(id, event);
+              }}
+              onError={() => null}
+            >
+              <Grid container>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={9}
+                  md={9}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    placeholder="Appointment Id"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={id}
+                    onChange={(e) => {
+                      setId(e.target.value);
+                    }}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+                <Grid
+                  className="flex items-center"
+                  item
+                  lg={1}
+                  md={1}
+                  sm={12}
+                  xs={12}
+                ></Grid>
+                <Grid
+                  // className="flex justify-center"
+                  item
+                  lg={2}
+                  md={2}
+                  sm={12}
+                  xs={12}
+                >
+                  <Button type="submit" variant="contained">
+                    Check
+                  </Button>
+                </Grid>
+              </Grid>
+
+              {/* <Button
+                // onClick={ checkAppointment }
+                value="check"
+                type="submit"
+              /> */}
+            </ValidatorForm>
           </div>
         </div>
 
