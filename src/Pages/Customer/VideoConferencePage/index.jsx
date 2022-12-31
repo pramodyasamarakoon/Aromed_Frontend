@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HeaderBox from "../../../components/HeaderBox";
 // import Button from "../../../components/MainButton";
 import Footer from "../../../Lib/Footer";
@@ -36,6 +36,7 @@ function VideoConference() {
   const [paymentStatus, setPaymentStatus] = useState(false);
   const [tempAppointmentId, setTempAppointmentId] = useState();
   const [data, setData] = useState();
+  const navigate = useNavigate();
 
   const onSubmit = async () => {
     // window.alert('Data Successfully Saved')
@@ -82,6 +83,7 @@ function VideoConference() {
       })
       .then(function (response) {
         console.log(response.data.paymentStatus);
+        navigate("/AppointmentConfirmation");
         setData(response);
         // if(response.status === 201 ){
         //   console.log("Succesfull");
@@ -391,20 +393,6 @@ function VideoConference() {
                   sm={12}
                   xs={12}
                 >
-                  {/* <TextValidator
-                      // sx={{ width: "90%" }}
-                      className="w-full mb-4 md:mb-0  "
-                      label="Doctor"
-                      fullWidth
-                      variant="outlined"
-                      size="small"
-                      value={doctor}
-                      onChange={(e) => {
-                        setDoctor(e.target.value);
-                      }}
-                      validators={["required"]}
-                      errorMessages={["This field is required"]}
-                    /> */}
                   <FormControl fullWidth>
                     <InputLabel>Select Doctor</InputLabel>
                     <Select
@@ -555,7 +543,7 @@ function VideoConference() {
           </div>
         ) : null}
       </div>
-      <div>
+      {/* <div>
         <div className="text-white px-6 py-4 border-0 rounded relative mb-4 bg-gray-500">
           <span className="text-xl inline-block mr-5 align-middle">
             <i className="fas fa-bell" />
@@ -568,7 +556,7 @@ function VideoConference() {
             <span>×</span>
           </button>
         </div>
-      </div>
+      </div> */}
       <Footer />
     </div>
   );

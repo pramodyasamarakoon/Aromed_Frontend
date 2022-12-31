@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HeaderBox from "../../../components/HeaderBox";
 import CheckFormBox from "../../../Lib/CheckFormBox";
 // import Button from "../../../components/MainButton";
@@ -15,14 +15,7 @@ import {
   InputLabel,
   Select,
 } from "@mui/material";
-
-function onSubmitID() {
-  window.alert("Searching for Data");
-}
-
-function onSubmit() {
-  window.alert("Data Successfully Saved");
-}
+import axios, * as others from "axios";
 
 function OrderMedicine() {
   const [orderID, setOrderID] = useState();
@@ -33,6 +26,59 @@ function OrderMedicine() {
   const [prescription, setPrescription] = useState();
   const [nic, setNic] = useState();
   const [message, setMessage] = useState();
+  const [snackBar, setSnackBar] = useState(false);
+  const [data, setData] = useState();
+  const [checkAppointmentId, setCheckAppointmentId] = useState();
+  const requestStatus = true;
+  const placedStatus = false;
+  const navigate = useNavigate();
+
+  const HandleOrderSubmit = async (id) => {
+    let res = await axios
+      .get(`http://localhost:8080/order/getOrderId/${id}`)
+      .then(function (response) {
+        console.log("Searched Data", response);
+        // // setData(response);
+        if (response.data != "") {
+          // console.log("Search Details", response.data);
+          if (response.data.requestStatus === false) {
+            console.log("Order Processing");
+            navigate("/OrderProcessing");
+          } else console.log("Order Successful");
+          navigate("/CompletedOrder");
+        } else console.log("No Data");
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
+
+  const onSubmit = async () => {
+    window.alert(mNumber);
+    setSnackBar(true);
+    let res = await axios
+      .post("http://localhost:8080/order/createOrder", {
+        name: name,
+        mNumber: mNumber,
+        email: email,
+        address: address,
+        prescription: prescription,
+        nic: nic,
+        message: message,
+        requestStatus: requestStatus,
+        placedStatus: placedStatus,
+      })
+      .then(function (response) {
+        console.log(response);
+        setData(response);
+        if (response.status === 201) {
+          window.alert("Order Success");
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  };
 
   return (
     <div className="bg-back-blue ">
@@ -55,26 +101,52 @@ function OrderMedicine() {
               Do you want to check about your previous order? You can enter your
               Order ID and get updated about your order.
             </p>
-            <div className="bg-box-blue/30">
-              <form className="md:flex w-[80%] m-auto py-8 ">
-                <input
-                  className="w-full mb-4 md:mb-0 mr-4  "
-                  type="text"
-                  name="orderID"
-                  required={true}
-                  placeholder="Order ID"
-                  // onChange={(e) => {
-                  //   setOrderID(e.target.value);
-                  // }}
-                />
-                <Link to="/OrderProcessing">
-                  <Button
-                    value="Check"
-                    // onClick={ onSubmitID }
-                    extraTailwind="p-4"
-                  />
-                </Link>
-              </form>
+            <div className="bg-white">
+              <div className="p-2 w-[80%] m-auto">
+                <ValidatorForm
+                  className="md:flex w-full m-auto py-4 "
+                  onSubmit={() => HandleOrderSubmit(checkAppointmentId)}
+                  onError={() => null}
+                >
+                  <Grid container spacing={1}>
+                    <Grid
+                      // className="flex items-center"
+                      item
+                      lg={9}
+                      md={9}
+                      sm={12}
+                      xs={12}
+                    >
+                      <TextValidator
+                        // sx={{ width: "90%" }}
+                        className="w-full mb-4 md:mb-0  "
+                        label="Order ID"
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        value={checkAppointmentId}
+                        onChange={(e) => {
+                          setCheckAppointmentId(e.target.value);
+                        }}
+                        validators={["required"]}
+                        errorMessages={["This field is required"]}
+                      />
+                    </Grid>
+                    <Grid
+                      className="flex justify-center"
+                      item
+                      lg={3}
+                      md={3}
+                      sm={12}
+                      xs={12}
+                    >
+                      <Button type="submit" variant="contained">
+                        Request Order
+                      </Button>
+                    </Grid>
+                  </Grid>
+                </ValidatorForm>
+              </div>
             </div>
           </div>
         </div>
@@ -245,6 +317,7 @@ function OrderMedicine() {
                     </p>
                     <FormControl fullWidth>
                       <Input
+                        required="true"
                         className="w-full mb-4 md:mb-0  "
                         fullWidth
                         size="small"
@@ -287,7 +360,7 @@ function OrderMedicine() {
                     xs={12}
                   >
                     <Button type="submit" variant="contained">
-                      Submit
+                      Request Order
                     </Button>
                   </Grid>
                 </Grid>

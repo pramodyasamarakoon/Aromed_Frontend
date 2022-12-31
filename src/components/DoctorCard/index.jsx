@@ -16,7 +16,7 @@ function DoctorCard(props) {
         onClick={togglePopup}
         className="flex justify-center"
       >
-        <Card className=" my-6 w-[237px] h-[281px] group cursor-pointer">
+        <Card className=" my-2 w-[237px] h-[281px] group cursor-pointer">
           <img
             className="h-full w-full object-cover rounded-xl absolute top-0 left-0"
             src={props.image}
@@ -28,7 +28,7 @@ function DoctorCard(props) {
           >
             <div className="">
               <p className="text-xl p-2 pb-0 font-bold ">{props.name}</p>
-              <p className="px-2 text-[14px] ">Specialist in {props.special}</p>
+              <p className="px-2 text-[14px] ">{props.special}</p>
             </div>
           </CardHeader>
         </Card>

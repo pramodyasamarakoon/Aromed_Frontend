@@ -20,53 +20,21 @@ import VideoCall from "../../assets/VideoCall.jpg";
 import Footer from "../../Lib/Footer";
 import { landingPageValidation } from "../../Validations/LandingPageV";
 import { ValidatorForm, TextValidator } from "react-material-ui-form-validator";
-import { Grid } from "@mui/material";
-
-/* Data for the doctor */
-const DOCTOR_CARDS_DETAILS = [
-  {
-    id: 1,
-    image: Doc1,
-    name: "Mr.Mitchel Barly",
-    special: "IT",
-  },
-  {
-    id: 2,
-    image: Doc2,
-    name: "Mr.Mitchel Barly",
-    special: "IT",
-  },
-  {
-    id: 3,
-    image: Doc3,
-    name: "Mr.Mitchel Barly",
-    special: "IT",
-  },
-  {
-    id: 4,
-    image: Doc4,
-    name: "Mr.Mitchel Barly",
-    special: "IT",
-  },
-  {
-    id: 5,
-    image: Doc5,
-    name: "Mr.Mitchel Barly",
-    special: "IT",
-  },
-  {
-    id: 6,
-    image: Doc1,
-    name: "Mr.Mitchel Barly",
-    special: "IT",
-  },
-  {
-    id: 7,
-    image: Doc2,
-    name: "Mr.Mitchel Barly",
-    special: "IT",
-  },
-];
+import {
+  Box,
+  Collapse,
+  Grid,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import { DoctorData } from "../../Lib/Const/DoctorData";
+import Paper from "@mui/material/Paper";
 
 // Check Appointment ID
 const checkAppointment = async (ID, e) => {
@@ -80,8 +48,143 @@ const checkAppointment = async (ID, e) => {
   }
 };
 
+function Row(props) {
+  const { row } = props;
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <React.Fragment>
+      <TableRow
+        onClick={() => setOpen(!open)}
+        sx={{ "& > *": { borderBottom: "unset", cursor: "pointer" } }}
+      >
+        <TableCell align="right" component="th" scope="row">
+          {row.res}
+        </TableCell>
+        <TableCell align="left">{row.name}</TableCell>
+        <TableCell align="left">{row.special}</TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ marginX: 6, marginY: 1 }}>
+              <Grid container spacing={1}>
+                <Grid
+                  // className="flex justify-center"
+                  item
+                  lg={6}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <div>
+                    <p className="text-back-blue font-semibold">
+                      Other Specialization...
+                    </p>
+                    <p className="text-black">{row.otherSpecialization}</p>
+                  </div>
+                </Grid>
+                <Grid
+                  // className="flex justify-center"
+                  item
+                  lg={6}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <div>
+                    <p className="text-back-blue font-semibold">
+                      Qualifications...
+                    </p>
+                    <p className="text-black">{row.qualifications}</p>
+                  </div>
+                </Grid>
+                <Grid
+                  // className="flex justify-center"
+                  item
+                  lg={6}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <div>
+                    <p className="text-back-blue font-semibold">
+                      Experience...
+                    </p>
+                    <p className="text-black">{row.experience}</p>
+                  </div>
+                </Grid>
+                <Grid
+                  // className="flex justify-center"
+                  item
+                  lg={6}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <div>
+                    <p className="text-back-blue font-semibold">
+                      Special Note...
+                    </p>
+                    <p className="text-black">{row.specialNote}</p>
+                  </div>
+                </Grid>
+              </Grid>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+}
+
 function LandingPage() {
+  const [doctor, setDoctor] = useState(DoctorData);
   const [id, setId] = useState();
+  const [userName, setUserName] = useState();
+  const [password, setPassword] = useState();
+  const [searchPhrase, setSearchPhrase] = useState("");
+  const [searchSpecial, setSearchSpecial] = useState("");
+
+  const signIn = () => {
+    window.alert("Sign Successfuly");
+  };
+
+  const search = (event) => {
+    const matchedUsers = DoctorData.filter((user) => {
+      return `${user.name}`
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase());
+    });
+
+    setDoctor(matchedUsers);
+    setSearchPhrase(event.target.value);
+  };
+
+  const searchSpecialization = (event) => {
+    const matchedUsers = DoctorData.filter((user) => {
+      return `${user.special}`
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase());
+    });
+
+    setDoctor(matchedUsers);
+    setSearchSpecial(event.target.value);
+  };
+
+  const renderUsers = () => {
+    return (
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableBody>
+            {doctor.map((user) => (
+              <Row row={user} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
 
   return (
     <div className="bg-back-blue ">
@@ -98,22 +201,6 @@ function LandingPage() {
             Appointment ID and get updated about your order.
           </p>
           <div className="bg-white">
-            {/* <form onSubmit={(event) => {checkAppointment(id, event)}} className="md:flex w-[80%] m-auto py-8 ">
-              <input
-                className="w-full mb-4 md:mb-0 mr-4  "
-                type="text"
-                placeholder='Appointment ID'
-                onChange={(e) => {setId(e.target.value)}}
-                value={id}
-              />
-              <Link to="/WaitingForAppointment">
-                <Button 
-                // onClick={ checkAppointment } 
-                value='check' />
-              </Link>
-              
-              
-            </form> */}
             <ValidatorForm
               className="md:flex w-[80%] m-auto py-4 "
               onSubmit={(event) => {
@@ -274,22 +361,100 @@ function LandingPage() {
         {/* Our Doctors */}
         <div>
           <HeaderBox header="Our Doctors" />
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
-            {DOCTOR_CARDS_DETAILS.map(({ id, image, name, special }) => (
-              <DoctorCard
-                key={id}
-                image={image}
-                name={name}
-                special={special}
-              />
-            ))}
+          <div className="bg-white">
+            <div className="p-1">
+              <ValidatorForm
+                className="md:flex w-[95%] m-auto py-4 "
+                // onSubmit={signIn}
+                // onError={() => null}
+              >
+                <Grid container spacing={1}>
+                  <Grid
+                    // className="flex items-center"
+                    item
+                    lg={6}
+                    md={6}
+                    sm={12}
+                    xs={12}
+                  >
+                    <p className="text-black">Search Doctor By Name</p>
+                    <TextValidator
+                      // sx={{ width: "90%" }}
+                      className="w-full md:mb-0  "
+                      label="Search Doctor"
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      value={searchPhrase}
+                      onChange={search}
+                    />
+                  </Grid>
+                  <Grid
+                    // className="flex items-center"
+                    item
+                    lg={6}
+                    md={6}
+                    sm={12}
+                    xs={12}
+                  >
+                    <p className="text-black">
+                      Search Doctor By Specialization
+                    </p>
+                    <TextValidator
+                      // sx={{ width: "90%" }}
+                      className="w-full md:mb-0  "
+                      label="Search Speacialization"
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      value={searchSpecial}
+                      onChange={searchSpecialization}
+                    />
+                  </Grid>
+                </Grid>
+              </ValidatorForm>
+            </div>
+            <div>
+              {/* <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                  <TableRow>
+                    <TableCell></TableCell>
+                    <TableCell align="left">Name</TableCell>
+                    <TableCell align="left">Specialization</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {doctor.map((user) => (
+                    <TableRow
+                      // key={row.name}
+                      // onClick={window.alert("Hiii")}
+                      sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+                    >
+                      <TableCell align="right" component="th" scope="row">
+                        {user.res}
+                      </TableCell>
+                      <TableCell align="left">{user.name}</TableCell>
+                      <TableCell align="left">{user.special}</TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer> */}
+            </div>
+          </div>
+          {/* <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ">
+            {renderUsers()}
+          </div> */}
+          <div className="bg-white">
+            <div className="my-2">{renderUsers()}</div>
           </div>
         </div>
 
         {/* Select appointment method */}
         <div className="grid grid-rows-2 sm:grid-rows-1 sm:grid-cols-2 gap-4 my-8">
           <div>
-            <Link to="/meetDoctor">
+            <Link to="/customer/meetDoctor">
               {/* eslint-disable-next-line */}
               <div className="sm:col-start-2 mx-8 sm:mx-0 col-span-2 h-[126px] relative group cursor-pointer ">
                 <img
@@ -308,7 +473,7 @@ function LandingPage() {
             </Link>
           </div>
           <div>
-            <Link to="/videoConference">
+            <Link to="/customer/videoConference">
               {/* eslint-disable-next-line */}
               <div className="sm:col-start-4 mx-8 sm:mx-0 col-span-2 h-[126px] relative group cursor-pointer ">
                 <img
@@ -332,22 +497,91 @@ function LandingPage() {
         {/* Staff Area */}
         <div id="3">
           <HeaderBox header="Staff Area" />
-          {/* eslint-disable-next-line */}
-          <div className="bg-box-blue/20 w-full py-8 px-4 flex flex-col justify-center text-center ">
-            <form>
-              <input
-                className="w-full my-2 sm:my-0 sm:w-[48%] mx-[5px]"
-                type="text"
-                placeholder="User Name"
-              />
-              <input
-                className="w-full my-2 sm:my-0 sm:w-[48%] mx-[5px]"
-                type="password"
-                placeholder="Password"
-              />
-              <p className="p-2 pb-8">Forgot Password?</p>
-              <Button value="Log In" />
-            </form>
+          <div className="bg-white">
+            <div className="p-2">
+              <ValidatorForm
+                className="md:flex w-[90%] m-auto py-4 "
+                onSubmit={signIn}
+                onError={() => null}
+              >
+                <Grid container spacing={1}>
+                  <Grid
+                    // className="flex items-center"
+                    item
+                    lg={6}
+                    md={6}
+                    sm={12}
+                    xs={12}
+                  >
+                    <TextValidator
+                      // sx={{ width: "90%" }}
+                      className="w-full mb-4 md:mb-0  "
+                      label="User Name"
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      value={userName}
+                      onChange={(e) => {
+                        setUserName(e.target.value);
+                      }}
+                      validators={["required"]}
+                      errorMessages={["This field is required"]}
+                    />
+                  </Grid>
+                  <Grid
+                    // className="flex items-center"
+                    item
+                    lg={6}
+                    md={6}
+                    sm={12}
+                    xs={12}
+                  >
+                    <TextValidator
+                      // sx={{ width: "90%" }}
+                      className="w-full mb-4 md:mb-0  "
+                      label="Password"
+                      type="password"
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      value={userName}
+                      onChange={(e) => {
+                        setPassword(e.target.value);
+                      }}
+                      validators={["required"]}
+                      errorMessages={["This field is required"]}
+                    />
+                  </Grid>
+
+                  <Grid
+                    className="flex mt-2 justify-center"
+                    item
+                    lg={12}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <Button type="submit" variant="contained">
+                      Sign In
+                    </Button>
+                  </Grid>
+                  <Grid
+                    className="flex mt-2 justify-center"
+                    item
+                    lg={12}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <a href="/ForgotPassword01">
+                      <p className="text-black font-semibold my-2">
+                        Forgot Password?
+                      </p>
+                    </a>
+                  </Grid>
+                </Grid>
+              </ValidatorForm>
+            </div>
           </div>
         </div>
       </div>

@@ -1,39 +1,154 @@
-import React from "react";
+import React, { useState } from "react";
+import {
+  Button,
+  Box,
+  Collapse,
+  FormControl,
+  Grid,
+  IconButton,
+  InputLabel,
+  MenuItem,
+  Select,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
+  FormLabel,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+} from "@mui/material";
+import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { Link } from "react-router-dom";
 import HeaderBox from "../../../../components/HeaderBox";
 import Logo from "../../../../components/Logo";
-import Button from "../../../../components/MainButton";
+// import Button from "../../../../components/MainButton";
 import Footer from "../../../../Lib/Footer";
+import { UserData } from "../../../../Lib/Const/UserData";
+import Paper from "@mui/material/Paper";
+import { MdDelete } from "react-icons/md";
 
-const USER_ACCOUNT_DETAILS = [
-  {
-    UserID: 123456,
-    Name: "Pramodya Samarakoon",
-    Role: "Receptionist",
-  },
-  {
-    UserID: 123456,
-    Name: "Pramodya Samarakoon",
-    Role: "Receptionist",
-  },
-  {
-    UserID: 123456,
-    Name: "Pramodya Samarakoon",
-    Role: "Receptionist",
-  },
-  {
-    UserID: 123456,
-    Name: "Pramodya Samarakoon",
-    Role: "Receptionist",
-  },
-  {
-    UserID: 123456,
-    Name: "Pramodya Samarakoon",
-    Role: "Receptionist",
-  },
-];
+function Row(props) {
+  const { row } = props;
+  const [open, setOpen] = React.useState(false);
+
+  return (
+    <React.Fragment>
+      <TableRow
+        onClick={() => setOpen(!open)}
+        sx={{ "& > *": { borderBottom: "unset", cursor: "pointer" } }}
+      >
+        <TableCell align="center" component="th" scope="row">
+          {row.id}
+        </TableCell>
+        <TableCell align="center">{row.name}</TableCell>
+        <TableCell align="center">{row.position}</TableCell>
+        <TableCell align="center">
+          <MdDelete />
+        </TableCell>
+      </TableRow>
+      <TableRow>
+        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
+          <Collapse in={open} timeout="auto" unmountOnExit>
+            <Box sx={{ marginX: 6, marginY: 1 }}>
+              <Grid container spacing={1}>
+                <Grid
+                  // className="flex justify-center"
+                  item
+                  lg={6}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <div className="flex justify-around">
+                    <p className="text-back-blue font-semibold">NIC</p>
+                    <p className="text-black">{row.nic}</p>
+                  </div>
+                </Grid>
+                <Grid
+                  // className="flex justify-center"
+                  item
+                  lg={6}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <div className="flex justify-around">
+                    <p className="text-back-blue font-semibold">Address</p>
+                    <p className="text-black">{row.address}</p>
+                  </div>
+                </Grid>
+              </Grid>
+            </Box>
+          </Collapse>
+        </TableCell>
+      </TableRow>
+    </React.Fragment>
+  );
+}
 
 function AdminHome() {
+  const [user, setUser] = useState(UserData);
+  const [searchPhrase, setSearchPhrase] = useState("");
+  const [userType, setUserType] = useState();
+  const [name, setName] = useState();
+  const [mNumber, setMNumber] = useState();
+  const [email, setEmail] = useState();
+  const [address, setAddress] = useState();
+  const [gender, setGender] = useState();
+  const [age, setAge] = useState();
+  const [nic, setNic] = useState();
+  const [userName, setUserName] = useState();
+  const [password, setPassword] = useState();
+  const [confirmPassword, setConfirmPassword] = useState();
+  const [specialisation, setSpecialisation] = useState();
+  const [qualification, setQualification] = useState();
+  const [experience, setExperience] = useState();
+  const [note, setNote] = useState();
+
+  // const componentDidMount = () => {
+  //   // custom rule will have name 'isPasswordMatch'
+  //   ValidatorForm.addValidationRule("isPasswordMatch", (value) => {
+  //     if (value !== this.state.user.password) {
+  //       return false;
+  //     }
+  //     return true;
+  //   });
+  // };
+
+  function addUser() {
+    // if (password === confirmPassword) {
+    //   console.log("password match");
+    // } else console.log("password doesnt match");
+    window.alert(password);
+  }
+
+  const search = (event) => {
+    const matchedUsers = UserData.filter((user) => {
+      return `${user.name}`
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase());
+    });
+
+    setUser(matchedUsers);
+    setSearchPhrase(event.target.value);
+  };
+
+  const renderUsers = () => {
+    return (
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableBody>
+            {user.map((user) => (
+              <Row row={user} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
+
   return (
     <div className="bg-back-blue ">
       {/* <NavBar/> */}
@@ -72,105 +187,462 @@ function AdminHome() {
       </div>
 
       {/* User Accounts */}
-      <div id="1" className="max-w-[1240px] mx-auto mt-[150px] ">
+      <div id="1" className="max-w-[1000px] mx-auto mt-[150px] ">
         <HeaderBox header="User Accounts" />
         {/* Filtering the date */}
-        <div className="bg-box-blue/30 flex px-20 py-4 justify-center ">
-          <input className="w-[60%]" type="text" placeholder="Search by Name" />
-
-          <Button value="Search" />
-        </div>
-
-        {/* Appointments Table */}
-        {/* Inner box */}
-        <div className="bg-box-blue/30 mt-4 py-4 px-32 ">
-          <div className="w-full mx-auto pt-4 pb-8 px-8 my-4 bg-white font-bold rounded-xl ">
-            {/* Bill items */}
-            <div className="pb-8   ">
-              <table className="table-auto w-full border-collapse border border-slate-500 ">
-                <thead>
-                  <th className=" border border-slate-600 bg-slate-400 ">
-                    User ID
-                  </th>
-
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Name
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Role
-                  </th>
-                </thead>
-                <tbody>
-                  {USER_ACCOUNT_DETAILS.map(({ UserID, Name, Role }) => (
-                    <tr className="trHover">
-                      <td className="text-center border border-slate-700">
-                        {UserID}
-                      </td>
-                      <td className="text-center border border-slate-700">
-                        {Name}
-                      </td>
-                      <td className="text-center border border-slate-700">
-                        {Role}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-            <div className="flex w-[400px] mx-auto ">
-              <Button value="Add New" />
-              <Button value="Remove" />
-            </div>
+        <div className="bg-white">
+          <div className="p-2">
+            <ValidatorForm
+              className="md:flex w-[90%] m-auto py-4 "
+              // onSubmit={signIn}
+              // onError={() => null}
+            >
+              <Grid container spacing={1}>
+                <Grid
+                  className="flex items-center"
+                  item
+                  lg={4}
+                  md={4}
+                  sm={12}
+                  xs={12}
+                >
+                  <p className="text-black">Search User By Name</p>
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={8}
+                  md={8}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full md:mb-0  "
+                    label="Search User"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={searchPhrase}
+                    onChange={search}
+                  />
+                </Grid>
+              </Grid>
+            </ValidatorForm>
           </div>
         </div>
 
-        {/* User Details */}
-        <HeaderBox header="User Details" />
-        <div id="2" className="bg-box-blue/20">
-          <div className="p-4">
-            {/* Name */}
-            <div className="w-full flex justify-between my-2 ">
-              <p className="my-auto w-[175px] pl-12 ">Name</p>
-              <input type="text" className="w-full" />
-            </div>
-            {/* Age and Gender */}
-            <div className="grid grid-cols-2 gap-8 ">
-              <div className="w-full flex justify-between my-2 ">
-                <p className="my-auto w-[200px] pl-12 ">Age</p>
-                <input type="number" className="w-full" />
-              </div>
-              <div className="w-full flex justify-between my-2 ">
-                <p className="my-auto w-[200px] pl-12 ">Gender</p>
-                <input type="text" className="w-[75%]" />
-              </div>
-            </div>
-            {/* Email and Mobile */}
-            <div className="grid grid-cols-2 gap-8 ">
-              <div className="w-full flex justify-between my-2 ">
-                <p className="my-auto w-[200px] pl-12 ">E mail</p>
-                <input type="email" className="w-full" />
-              </div>
-              <div className="w-full flex justify-between my-2 ">
-                <p className="my-auto w-[200px] pl-12 ">Mobile</p>
-                <input type="number" className="w-[75%]" />
-              </div>
-            </div>
-            {/* User Name and Password */}
-            <div className="grid grid-cols-2 gap-8 ">
-              <div className="w-full flex justify-between my-2 ">
-                <p className="my-auto w-[200px] pl-12 ">User Name</p>
-                <input type="text" className="w-full" />
-              </div>
-              <div className="w-full flex justify-between my-2 ">
-                <p className="my-auto w-[200px] pl-12 ">Password</p>
-                <input type="password" className="w-[75%]" />
-              </div>
-            </div>
+        <div className="bg-white">
+          <div className="my-2">{renderUsers()}</div>
+        </div>
 
-            {/* Buttons */}
-            <div className="flex justify-evenly w-[400px] mx-auto py-12 ">
-              <Button value="Add" />
-            </div>
+        {/* User Details */}
+        <HeaderBox header="New User" />
+        <div className="bg-white">
+          <div className="p-4">
+            <ValidatorForm
+              className="md:flex w-full m-auto py-4 "
+              onSubmit={addUser}
+              onError={() => null}
+            >
+              <Grid container spacing={1}>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <FormControl fullWidth>
+                    <InputLabel>User Types</InputLabel>
+                    <Select
+                      value={userType}
+                      // label="Gender"
+                      size="small"
+                      required={true}
+                      defaultValue={"Male"}
+                      onChange={(e) => {
+                        setUserType(e.target.value);
+                      }}
+                    >
+                      <MenuItem value={"Admin"}>Admin</MenuItem>
+                      <MenuItem value={"Doctor"}>Doctor</MenuItem>
+                      <MenuItem value={"Receptionist"}>Receptionist</MenuItem>
+                      <MenuItem value={"Pharmacist"}>Pharmacist</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="Name"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                    }}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="Mobile Number"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    required={true}
+                    value={mNumber}
+                    onChange={(e) => {
+                      setMNumber(e.target.value);
+                    }}
+                    validators={[
+                      "required",
+                      "isNumber",
+                      "maxNumber:9999999999",
+                      "minStringLength:10",
+                      // "matchRegexp:^[0-99]$",
+                    ]}
+                    errorMessages={[
+                      "This field is required",
+                      "Invalid Number",
+                      "Invalid Number",
+                      "Invalid Number",
+                    ]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="Email"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                    }}
+                    validators={["required", "isEmail"]}
+                    errorMessages={["This field is required", "Invalid Email"]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={12}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="Address"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={address}
+                    onChange={(e) => {
+                      setAddress(e.target.value);
+                    }}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <FormControl fullWidth>
+                    <InputLabel>Gender</InputLabel>
+                    <Select
+                      value={gender}
+                      label="Gender"
+                      size="small"
+                      required={true}
+                      defaultValue={"Male"}
+                      onChange={(e) => {
+                        setGender(e.target.value);
+                      }}
+                    >
+                      <MenuItem value={"Male"}>Male</MenuItem>
+                      <MenuItem value={"Female"}>Female</MenuItem>
+                    </Select>
+                  </FormControl>
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="Age"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={age}
+                    onChange={(e) => {
+                      setAge(e.target.value);
+                    }}
+                    validators={[
+                      "required",
+                      "isNumber",
+                      "maxNumber:100",
+                      "minNumber:0",
+                    ]}
+                    errorMessages={[
+                      "This field is required",
+                      "Invalid Age",
+                      "Invalid Age",
+                      "Age Must be Positive",
+                    ]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="NIC"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={nic}
+                    onChange={(e) => {
+                      setNic(e.target.value);
+                    }}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="User Name"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={userName}
+                    onChange={(e) => {
+                      setUserName(e.target.value);
+                    }}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="Password"
+                    fullWidth
+                    type="password"
+                    variant="outlined"
+                    size="small"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                    }}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="Confirm Password"
+                    fullWidth
+                    type="password"
+                    variant="outlined"
+                    size="small"
+                    value={confirmPassword}
+                    onChange={(e) => {
+                      setConfirmPassword(e.target.value);
+                      // componentDidMount();
+                    }}
+                    validators={[" required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+
+                {userType === "Doctor" ? (
+                  <Grid
+                    container
+                    spacing={1}
+                    style={{ marginLeft: "1px", marginTop: "1px" }}
+                  >
+                    <Grid
+                      // className="flex items-center"
+                      item
+                      lg={6}
+                      md={6}
+                      sm={12}
+                      xs={12}
+                    >
+                      <TextValidator
+                        // sx={{ width: "90%" }}
+                        className="w-full mb-4 md:mb-0  "
+                        label="Other Specializations"
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        value={specialisation}
+                        onChange={(e) => {
+                          setSpecialisation(e.target.value);
+                        }}
+                      />
+                    </Grid>
+                    <Grid
+                      // className="flex items-center"
+                      item
+                      lg={6}
+                      md={6}
+                      sm={12}
+                      xs={12}
+                    >
+                      <TextValidator
+                        // sx={{ width: "90%" }}
+                        className="w-full mb-4 md:mb-0  "
+                        label="Qualifications"
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        value={qualification}
+                        onChange={(e) => {
+                          setQualification(e.target.value);
+                        }}
+                      />
+                    </Grid>
+                    <Grid
+                      // className="flex items-center"
+                      item
+                      lg={6}
+                      md={6}
+                      sm={12}
+                      xs={12}
+                    >
+                      <TextValidator
+                        // sx={{ width: "90%" }}
+                        className="w-full mb-4 md:mb-0  "
+                        label="Experience"
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        value={experience}
+                        onChange={(e) => {
+                          setExperience(e.target.value);
+                        }}
+                      />
+                    </Grid>
+                    <Grid
+                      // className="flex items-center"
+                      item
+                      lg={6}
+                      md={6}
+                      sm={12}
+                      xs={12}
+                    >
+                      <TextValidator
+                        // sx={{ width: "90%" }}
+                        className="w-full mb-4 md:mb-0  "
+                        label="Special Note"
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        value={note}
+                        onChange={(e) => {
+                          setNote(e.target.value);
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                ) : null}
+
+                {/* Submit */}
+                <Grid
+                  className="flex justify-center"
+                  item
+                  lg={12}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <Button
+                    variant="contained"
+                    // onClick={}
+                    type="submit"
+                  >
+                    Add User
+                  </Button>
+                </Grid>
+              </Grid>
+            </ValidatorForm>
           </div>
         </div>
       </div>

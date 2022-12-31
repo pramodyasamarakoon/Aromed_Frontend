@@ -31,21 +31,18 @@ function App() {
       <Router>
         <Routes>
           {/* Customer */}
-          {/* Error */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/orderMedicine" element={<OrderMedicine />} />
           <Route path="/customer/videoConference" element={<VideoConference />} />
           <Route path="/customer/meetDoctor" element={<MeetDoctor />} />
           <Route path="/LaboratoryFees" element={<LaboratoryFees />} />
-          {/* Fine */}
           <Route path="/ForgotPassword01" element={<ForgotPassword01 />} />
           <Route path="/ForgotPassword02" element={<ForgotPassword02 />} />
           <Route path="/PayByCard" element={<PayByCard />} />
           <Route
-            path="/AppointmentConfirmation"
+            path="/customer/AppointmentConfirmation"
             element={<AppointmentConfirmation />}
           />
-          
           <Route
             path="/WaitingForAppointment"
             element={<WaitingForAppointment />}
@@ -55,7 +52,6 @@ function App() {
             path="/BeforeLoginAppointment"
             element={<BeforeLoginAppointment />}
           />
-
           <Route
             path="/SuccessfulOrderRequest"
             element={<SuccessfulOrderRequest />}
@@ -63,18 +59,23 @@ function App() {
           <Route path="/OrderProcessing" element={<OrderProcessing />} />
           <Route path="/CompletedOrder" element={<CompletedOrder />} />
           <Route path="/OrderSuccessful" element={<OrderSuccessful />} />
+
           {/* Receptionist */}
           <Route path="/ReceptionistHome" element={<ReceptionistHome />} />
           <Route path="/ReceptionistLab" element={<ReceptionistLab />} />
+
           {/* Pharmacist */}
           <Route path="/PharmacistHome" element={<PharmacistHome />} />
+
           {/* Doctor */}
           <Route path="/DoctorHome" element={<DoctorHome />} />
           <Route path="/DoctorAvailability" element={<DoctorAvailability />} />
           <Route path="/DoctorMeeting" element={<DoctorMeeting />} />
+
           {/* Admin */}
           <Route path="/AdminHome" element={<AdminHome />} />
           <Route path="/AdminCharges" element={<AdminCharges />} />
+          
           {/* Account Page */}
           <Route path="/AccountPage" element={<AccountPage />} />
         </Routes>
