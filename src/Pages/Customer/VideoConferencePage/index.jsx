@@ -15,6 +15,7 @@ import {
   Select,
 } from "@mui/material";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
+import { toast, ToastContainer } from "react-toastify";
 
 function VideoConference() {
   const [name, setName] = useState("");
@@ -25,6 +26,7 @@ function VideoConference() {
   const [age, setAge] = useState();
   const [nic, setNic] = useState();
   const [doctor, setDoctor] = useState();
+  const [pName, setPName] = useState();
   const [appointmentFee, setAppointmentFee] = useState(1500);
   const [date, setDate] = useState();
   const [message, setMessage] = useState();
@@ -40,10 +42,21 @@ function VideoConference() {
 
   const onSubmit = async () => {
     // window.alert('Data Successfully Saved')
+    toast.success("Customer Registered Successfully!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
     setSnackBar(true);
     let res = await axios
       .post("http://localhost:8080/customer/videoConference", {
         name: name,
+        pName: pName,
         mNumber: mNumber,
         email: email,
         address: address,
@@ -71,10 +84,33 @@ function VideoConference() {
       })
       .catch(function (error) {
         console.log(error);
+        toast.error(
+          { error },
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          }
+        );
       });
   };
 
   const bookAnAppointment = async () => {
+    toast.success("Appointment Placed Successfully!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "dark",
+    });
     let res = await axios
       .post("http://localhost:8080/customer/meetAppointment", {
         appointmentId: tempAppointmentId,
@@ -82,14 +118,27 @@ function VideoConference() {
         amount: amount,
       })
       .then(function (response) {
-        console.log(response.data.paymentStatus);
-        navigate("/AppointmentConfirmation");
+        // console.log(response.data.paymentStatus);
+        navigate("/customer/AppointmentConfirmation");
         setData(response);
         // if(response.status === 201 ){
         //   console.log("Succesfull");
         // }
       })
       .catch(function (error) {
+        toast.error(
+          { error },
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          }
+        );
         // console.log(error);
       });
     // if ( tempAppointmentId === data.data.appointmentId ){
@@ -189,6 +238,18 @@ function VideoConference() {
                 <Grid
                   // className="flex items-center"
                   item
+                  lg={12}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <p className="text-black mx-2 text-[18px] font-semibold">
+                    Gaurdian Details
+                  </p>
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
                   lg={6}
                   md={6}
                   sm={12}
@@ -270,6 +331,29 @@ function VideoConference() {
                 <Grid
                   // className="flex items-center"
                   item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="NIC"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={nic}
+                    onChange={(e) => {
+                      setNic(e.target.value);
+                    }}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
                   lg={12}
                   md={12}
                   sm={12}
@@ -285,6 +369,41 @@ function VideoConference() {
                     value={address}
                     onChange={(e) => {
                       setAddress(e.target.value);
+                    }}
+                    validators={["required"]}
+                    errorMessages={["This field is required"]}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={12}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <p className="text-black mx-2 mt-1 font-semibold text-[18px]">
+                    Patient Details
+                  </p>
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full mb-4 md:mb-0  "
+                    label="Name"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={pName}
+                    onChange={(e) => {
+                      setPName(e.target.value);
                     }}
                     validators={["required"]}
                     errorMessages={["This field is required"]}
@@ -362,29 +481,7 @@ function VideoConference() {
                     ]}
                   />
                 </Grid>
-                <Grid
-                  // className="flex items-center"
-                  item
-                  lg={6}
-                  md={6}
-                  sm={12}
-                  xs={12}
-                >
-                  <TextValidator
-                    // sx={{ width: "90%" }}
-                    className="w-full mb-4 md:mb-0  "
-                    label="NIC"
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    value={nic}
-                    onChange={(e) => {
-                      setNic(e.target.value);
-                    }}
-                    validators={["required"]}
-                    errorMessages={["This field is required"]}
-                  />
-                </Grid>
+
                 <Grid
                   // className="flex items-center"
                   item
@@ -557,6 +654,7 @@ function VideoConference() {
           </button>
         </div>
       </div> */}
+      <ToastContainer />
       <Footer />
     </div>
   );

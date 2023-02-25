@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// Add delete button to the user list
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Box,
@@ -25,28 +26,50 @@ import HeaderBox from "../../../../components/HeaderBox";
 import Logo from "../../../../components/Logo";
 // import Button from "../../../../components/MainButton";
 import Footer from "../../../../Lib/Footer";
-import { UserData } from "../../../../Lib/Const/UserData";
+// import { UserData } from "../../../../Lib/Const/UserData";
 import Paper from "@mui/material/Paper";
 import { MdDelete } from "react-icons/md";
+import Popup from "reactjs-popup";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import axios from "axios";
+import { TiDelete } from "react-icons/ti";
+import ReactDOM from "react-dom";
 
 function Row(props) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
+  const deleteUser = () => {
+    window.alert("Delete");
+  };
+
   return (
     <React.Fragment>
       <TableRow
-        onClick={() => setOpen(!open)}
+        // onClick={() => setOpen(!open)}
         sx={{ "& > *": { borderBottom: "unset", cursor: "pointer" } }}
       >
         <TableCell align="center" component="th" scope="row">
-          {row.id}
+          {row.userId}
         </TableCell>
-        <TableCell align="center">{row.name}</TableCell>
-        <TableCell align="center">{row.position}</TableCell>
-        <TableCell align="center">
-          <MdDelete />
+        <TableCell align="left" sx={{ paddingLeft: "20px" }}>
+          {row.name}
         </TableCell>
+        <TableCell align="center">{row.userType}</TableCell>
+        {/* <TableCell align="right">
+          <Button
+            variant="outlined"
+            sx={{
+              padding: "2px 4px",
+              fontSize: "0.8rem",
+            }}
+            onClick={(row) => console.log({ row })}
+            // type="submit"
+          >
+            Remove
+          </Button>
+        </TableCell> */}
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -89,7 +112,7 @@ function Row(props) {
 }
 
 function AdminHome() {
-  const [user, setUser] = useState(UserData);
+  // const [user, setUser] = useState(UserData);
   const [searchPhrase, setSearchPhrase] = useState("");
   const [userType, setUserType] = useState();
   const [name, setName] = useState();
@@ -101,37 +124,98 @@ function AdminHome() {
   const [nic, setNic] = useState();
   const [userName, setUserName] = useState();
   const [password, setPassword] = useState();
-  const [confirmPassword, setConfirmPassword] = useState();
-  const [specialisation, setSpecialisation] = useState();
-  const [qualification, setQualification] = useState();
-  const [experience, setExperience] = useState();
-  const [note, setNote] = useState();
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [specialisation, setSpecialisation] = useState("");
+  const [qualification, setQualification] = useState("");
+  const [experience, setExperience] = useState("");
+  const [note, setNote] = useState("");
+  const [charge, setCharge] = useState();
+  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
 
-  // const componentDidMount = () => {
-  //   // custom rule will have name 'isPasswordMatch'
-  //   ValidatorForm.addValidationRule("isPasswordMatch", (value) => {
-  //     if (value !== this.state.user.password) {
-  //       return false;
-  //     }
-  //     return true;
-  //   });
-  // };
+  useEffect(() => {
+    fetch("http://localhost:8080/user/allUsers")
+      .then((response) => response.json())
+      .then((data) => setUsers(data))
+      .catch((error) => console.log(error));
+  }, []);
 
-  function addUser() {
-    // if (password === confirmPassword) {
-    //   console.log("password match");
-    // } else console.log("password doesnt match");
-    window.alert(password);
-  }
+  const checkUserName = async () => {
+    window.alert("Found", userName);
+  };
+
+  const addUser = async () => {
+    if (password === confirmPassword) {
+      console.log("password match");
+      toast.success("User Successfully Registered!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+      let res = await axios
+        .post("http://localhost:8080/user/addUser", {
+          userType: userType,
+          name: name,
+          mNumber: mNumber,
+          email: email,
+          address: address,
+          gender: gender,
+          age: age,
+          nic: nic,
+          userName: userName,
+          password: password,
+          specialisation: specialisation,
+          qualification: qualification,
+          experience: experience,
+          note: note,
+          charge: charge,
+        })
+        .then(function (response) {
+          console.log(response);
+          // setData(response);
+          if (response.status === 201) {
+            console.log("Data Successfully Added", response.data.userId);
+            // setBillHandler(true);
+            // appConst.doctors.forEach((element, index) => {
+            //   if (doctor === appConst.doctors.find(doctor)) {
+            //     console.log("Success");
+            //   }
+            //   console.log("Error");
+            // });
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+      // window.location.reload();
+    } else {
+      console.log("password does not match");
+      toast.error("Password does not match!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
+    // window.alert(password);
+  };
 
   const search = (event) => {
-    const matchedUsers = UserData.filter((user) => {
+    const matchedUsers = users.filter((user) => {
       return `${user.name}`
         .toLowerCase()
         .includes(event.target.value.toLowerCase());
     });
-
-    setUser(matchedUsers);
+    setUsers(matchedUsers);
     setSearchPhrase(event.target.value);
   };
 
@@ -140,7 +224,7 @@ function AdminHome() {
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
           <TableBody>
-            {user.map((user) => (
+            {users.map((user) => (
               <Row row={user} />
             ))}
           </TableBody>
@@ -526,7 +610,7 @@ function AdminHome() {
                       setConfirmPassword(e.target.value);
                       // componentDidMount();
                     }}
-                    validators={[" required"]}
+                    validators={["required"]}
                     errorMessages={["This field is required"]}
                   />
                 </Grid>
@@ -621,6 +705,29 @@ function AdminHome() {
                         }}
                       />
                     </Grid>
+                    <Grid
+                      // className="flex items-center"
+                      item
+                      lg={6}
+                      md={6}
+                      sm={12}
+                      xs={12}
+                    >
+                      <TextValidator
+                        // sx={{ width: "90%" }}
+                        className="w-full mb-4 md:mb-0  "
+                        label="Charge"
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        value={charge}
+                        onChange={(e) => {
+                          setCharge(e.target.value);
+                        }}
+                        validators={["isNumber"]}
+                        errorMessages={["Charge should be Numeric"]}
+                      />
+                    </Grid>
                   </Grid>
                 ) : null}
 
@@ -635,14 +742,25 @@ function AdminHome() {
                 >
                   <Button
                     variant="contained"
-                    // onClick={}
-                    type="submit"
+                    onClick={checkUserName}
+                    // type="submit"
                   >
                     Add User
                   </Button>
                 </Grid>
               </Grid>
             </ValidatorForm>
+          </div>
+          <div className="flex justify-center text-black">
+            {/* <Popup trigger={<button> Trigger</button>} position="center">
+              <div className="bg-back-blue p-4 w-full mx-auto">
+                <p className="flex justify-center text-center">
+                  Password Does not match!!!
+                </p>
+              </div>
+            </Popup> */}
+            {/* <Button onClick={notify}>Notify!</Button> */}
+            <ToastContainer />
           </div>
         </div>
       </div>

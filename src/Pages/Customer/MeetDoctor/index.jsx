@@ -18,6 +18,7 @@ import {
 
 function MeetDoctor() {
   const [name, setName] = useState("");
+  const [pName, setPName] = useState();
   const [mNumber, setMNumber] = useState();
   const [email, setEmail] = useState();
   const [address, setAddress] = useState();
@@ -44,6 +45,7 @@ function MeetDoctor() {
     let res = await axios
       .post("http://localhost:8080/customer/videoConference", {
         name: name,
+        pName: pName,
         mNumber: mNumber,
         email: email,
         address: address,
@@ -162,6 +164,18 @@ function MeetDoctor() {
                   <Grid
                     // className="flex items-center"
                     item
+                    lg={12}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <p className="text-black mx-2 text-[18px] font-semibold">
+                      Gaurdian Details
+                    </p>
+                  </Grid>
+                  <Grid
+                    // className="flex items-center"
+                    item
                     lg={6}
                     md={6}
                     sm={12}
@@ -246,6 +260,29 @@ function MeetDoctor() {
                   <Grid
                     // className="flex items-center"
                     item
+                    lg={6}
+                    md={6}
+                    sm={12}
+                    xs={12}
+                  >
+                    <TextValidator
+                      // sx={{ width: "90%" }}
+                      className="w-full mb-4 md:mb-0  "
+                      label="NIC"
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      value={nic}
+                      onChange={(e) => {
+                        setNic(e.target.value);
+                      }}
+                      validators={["required"]}
+                      errorMessages={["This field is required"]}
+                    />
+                  </Grid>
+                  <Grid
+                    // className="flex items-center"
+                    item
                     lg={12}
                     md={12}
                     sm={12}
@@ -261,6 +298,41 @@ function MeetDoctor() {
                       value={address}
                       onChange={(e) => {
                         setAddress(e.target.value);
+                      }}
+                      validators={["required"]}
+                      errorMessages={["This field is required"]}
+                    />
+                  </Grid>
+                  <Grid
+                    // className="flex items-center"
+                    item
+                    lg={12}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <p className="text-black mx-2 mt-1 font-semibold text-[18px]">
+                      Patient Details
+                    </p>
+                  </Grid>
+                  <Grid
+                    // className="flex items-center"
+                    item
+                    lg={6}
+                    md={6}
+                    sm={12}
+                    xs={12}
+                  >
+                    <TextValidator
+                      // sx={{ width: "90%" }}
+                      className="w-full mb-4 md:mb-0  "
+                      label="Name"
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      value={pName}
+                      onChange={(e) => {
+                        setPName(e.target.value);
                       }}
                       validators={["required"]}
                       errorMessages={["This field is required"]}
@@ -336,29 +408,6 @@ function MeetDoctor() {
                         "Invalid Age",
                         "Age Must be Positive",
                       ]}
-                    />
-                  </Grid>
-                  <Grid
-                    // className="flex items-center"
-                    item
-                    lg={6}
-                    md={6}
-                    sm={12}
-                    xs={12}
-                  >
-                    <TextValidator
-                      // sx={{ width: "90%" }}
-                      className="w-full mb-4 md:mb-0  "
-                      label="NIC"
-                      fullWidth
-                      variant="outlined"
-                      size="small"
-                      value={nic}
-                      onChange={(e) => {
-                        setNic(e.target.value);
-                      }}
-                      validators={["required"]}
-                      errorMessages={["This field is required"]}
                     />
                   </Grid>
                   <Grid

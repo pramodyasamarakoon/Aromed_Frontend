@@ -35,6 +35,8 @@ import {
 } from "@mui/material";
 import { DoctorData } from "../../Lib/Const/DoctorData";
 import Paper from "@mui/material/Paper";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 // Check Appointment ID
 const checkAppointment = async (ID, e) => {
@@ -43,7 +45,6 @@ const checkAppointment = async (ID, e) => {
 
   if (appointmentID != undefined) {
     window.alert(appointmentID);
-    const isValid = await landingPageValidation.isValid(appointmentID);
     // window.alert(isValid)
   }
 };
@@ -147,7 +148,50 @@ function LandingPage() {
   const [searchSpecial, setSearchSpecial] = useState("");
 
   const signIn = () => {
-    window.alert("Sign Successfuly");
+    axios
+      .post("http://localhost:8080/user/login", { userName, password })
+      .then((response) => {
+        // window.alert("Successful");
+        console.log(response.data);
+        if (response.data == "Username doesn't Exist") {
+          toast.error("Username doesnt Exist", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        } else if (response.data == "Password doesn't match") {
+          toast.error("Incorrect Password", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        } else if (response.data == "Login Successful") {
+          toast.success("Login Successful", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+        }
+      })
+      .catch((error) => {
+        // Handle login error
+        window.alert("UnSuccessful");
+      });
   };
 
   const search = (event) => {
@@ -544,7 +588,7 @@ function LandingPage() {
                       fullWidth
                       variant="outlined"
                       size="small"
-                      value={userName}
+                      value={password}
                       onChange={(e) => {
                         setPassword(e.target.value);
                       }}
@@ -581,6 +625,9 @@ function LandingPage() {
                   </Grid>
                 </Grid>
               </ValidatorForm>
+              <div className="flex justify-center text-black">
+                <ToastContainer />
+              </div>
             </div>
           </div>
         </div>

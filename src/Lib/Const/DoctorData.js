@@ -1,3 +1,4 @@
+import axios from "axios";
 import Doc1 from "../../assets/Doc1.jpg";
 import Doc2 from "../../assets/Doc2.jpg";
 import Doc3 from "../../assets/Doc3.jpg";
@@ -83,3 +84,35 @@ export const DoctorData = [
         specialNote: "Loremfbhdgndfjb dnab nb gfngfb nb nfdv sd",
       },
 ]
+
+// function DoctorData () {
+//   const data = async () => {
+//     let res = await axios
+//       .get("http://localhost:8080/customer/videoConference", {
+//         name: name,
+//         pName: pName,
+//         mNumber: mNumber,
+//         email: email,
+//         address: address,
+//         gender: gender,
+//         age: age,
+//         nic: nic,
+//         doctor: doctor,
+//         date: date,
+//         message: message,
+//         videoConference: videoConference,
+//       })
+//       .then(function (response) {
+//         console.log(response);
+//         setData(response);
+//         if (response.status === 201) {
+//           console.log(response.data.appointmentId);
+//         }
+//       })
+//       .catch(function (error) {
+//         console.log(error);
+//       });
+//   }
+// }
+
+// export default DoctorData;
