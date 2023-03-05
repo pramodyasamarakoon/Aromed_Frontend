@@ -24,6 +24,7 @@ import DoctorMeeting from "./Pages/OtherPages/Doctor/DoctorMeeting";
 import AdminHome from "./Pages/OtherPages/Admin/AdminHome";
 import AdminCharges from "./Pages/OtherPages/Admin/AdminCharges";
 import AccountPage from "./Pages/OtherPages/AccountPage";
+import NotTodayAppointment from "./Pages/Customer/NotTodayAppointment";
 
 function App() {
   return (
@@ -46,6 +47,10 @@ function App() {
           <Route
             path="/WaitingForAppointment"
             element={<WaitingForAppointment />}
+          />
+          <Route
+            path="/NotTodayAppointment"
+            element={<NotTodayAppointment />}
           />
           <Route path="/MyTurnAppointment" element={<MyTurnAppointment />} />
           <Route

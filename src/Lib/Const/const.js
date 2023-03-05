@@ -1,20 +1,21 @@
-export const doctors = [
-    { 
-        name: "Dr. Shakthi Selvarathnam",
-        charge: 1500
-    }, 
-    { 
-        name: "Dr. Anuradha Rajapaksha" ,
-        charge: 1800
-    }, 
-    { 
-        name: "Dr. Asanka Mularachchi" ,
-        charge: 2000
-    }, 
-    { 
-        name: "Dr. Buddhika Samarasinghe" ,
-        charge: 1400
-    },
+
+
+import axios from 'axios';
+
+export const getAllDoctors = async () => {
+  try {
+    const response = await axios.get('http://localhost:8080/user/allDoctors');
+    return response.data;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export const charges = [
+  {
+    name: "Appointment Fee",
+    charge: 800
+  }
 ]
 
 export const deliveryChargers = [

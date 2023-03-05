@@ -444,9 +444,9 @@ function MeetDoctor() {
                           setDoctor(e.target.value);
                         }}
                       >
-                        {appConst.doctors.map((data) => (
+                        {/* {appConst.doctors.map((data) => (
                           <MenuItem value={data.name}>{data.name}</MenuItem>
-                        ))}
+                        ))} */}
                       </Select>
                     </FormControl>
                   </Grid>

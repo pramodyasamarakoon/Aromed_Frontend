@@ -1,10 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import HeaderBox from "../../../components/HeaderBox";
 // import Button from "../../../components/MainButton";
 import Footer from "../../../Lib/Footer";
 import NavBar from "../../../Lib/NavBar";
-import * as appConst from "../../../Lib/Const/const";
+import { getAllDoctors } from "../../../Lib/Const/const";
 import axios, * as others from "axios";
 import {
   Button,
@@ -16,6 +16,9 @@ import {
 } from "@mui/material";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { toast, ToastContainer } from "react-toastify";
+// const sgMail = require("@sendgrid/mail");
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+import { charges } from "../../../Lib/Const/const";
 
 function VideoConference() {
   const [name, setName] = useState("");
@@ -25,6 +28,7 @@ function VideoConference() {
   const [gender, setGender] = useState();
   const [age, setAge] = useState();
   const [nic, setNic] = useState();
+  const [doctors, setDoctors] = useState([]);
   const [doctor, setDoctor] = useState();
   const [pName, setPName] = useState();
   const [appointmentFee, setAppointmentFee] = useState(1500);
@@ -37,8 +41,27 @@ function VideoConference() {
   const [billHandler, setBillHandler] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(false);
   const [tempAppointmentId, setTempAppointmentId] = useState();
+  const [doctorCharge, setDoctorCharge] = useState();
   const [data, setData] = useState();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await getAllDoctors();
+      setDoctors(result);
+      console.log("Doc", result);
+    };
+    fetchData();
+  }, []);
+
+  const findDoctorCharge = (id) => {
+    const doctorId = doctor;
+    const doctorF = doctors.find((d) => d.userId === id);
+    const charge = doctorF ? doctorF.charge : null;
+    setDoctorCharge(charge);
+    console.log(charge);
+    return charge;
+  };
 
   const onSubmit = async () => {
     // window.alert('Data Successfully Saved')
@@ -72,7 +95,8 @@ function VideoConference() {
         console.log(response);
         setData(response);
         if (response.status === 201) {
-          console.log(response.data.appointmentId);
+          console.log("Submit Customer", response.data);
+          setTempAppointmentId(response.data.appointmentId);
           setBillHandler(true);
           // appConst.doctors.forEach((element, index) => {
           //   if (doctor === appConst.doctors.find(doctor)) {
@@ -100,17 +124,7 @@ function VideoConference() {
       });
   };
 
-  const bookAnAppointment = async () => {
-    toast.success("Appointment Placed Successfully!", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
+  const bookAnAppointmentWithPayment = async () => {
     let res = await axios
       .post("http://localhost:8080/customer/meetAppointment", {
         appointmentId: tempAppointmentId,
@@ -118,12 +132,39 @@ function VideoConference() {
         amount: amount,
       })
       .then(function (response) {
-        // console.log(response.data.paymentStatus);
-        navigate("/customer/AppointmentConfirmation");
+        toast.success("Appointment Placed Successfully!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+        let data = response.data.customer;
+        console.log("Submit Appointment", data);
+        navigate(
+          `/customer/AppointmentConfirmation?appointmentId=${data.appointmentId}&date=${data.date}&appointmentNumber=${data.appointmentNumber}`
+        );
+
+        // Send an e mail
+        // const msg = {
+        //   to: "test@example.com", // Change to your recipient
+        //   from: "test@example.com", // Change to your verified sender
+        //   subject: "Sending with SendGrid is Fun",
+        //   text: "and easy to do anywhere, even with Node.js",
+        //   html: "<strong>and easy to do anywhere, even with Node.js</strong>",
+        // };
+        // sgMail
+        //   .send(msg)
+        //   .then(() => {
+        //     console.log("Email sent");
+        //   })
+        //   .catch((error) => {
+        //     console.error(error);
+        //   });
         setData(response);
-        // if(response.status === 201 ){
-        //   console.log("Succesfull");
-        // }
       })
       .catch(function (error) {
         toast.error(
@@ -150,32 +191,32 @@ function VideoConference() {
     // }
   };
 
-  const bookAnAppointmentWithPayment = async () => {
-    setPaymentStatus(true);
-    let res = await axios
-      .post("http://localhost:8080/customer/meetAppointment", {
-        appointmentId: tempAppointmentId,
-        paymentStatus: paymentStatus,
-        amount: amount,
-      })
-      .then(function (response) {
-        console.log(response.data.paymentStatus);
-        setData(response);
-        // if(response.status === 201 ){
-        //   console.log("Succesfull");
-        // }
-      })
-      .catch(function (error) {
-        // console.log(error);
-      });
-    // if ( tempAppointmentId === data.data.appointmentId ){
-    //   setPaymentStatus(false);
-    //   // console.log(paymentStatus);
-    // }
-    // else{
-    //   console.log(paymentStatus);
-    // }
-  };
+  // const bookAnAppointmentWithPayment = async () => {
+  //   setPaymentStatus(true);
+  //   let res = await axios
+  //     .post("http://localhost:8080/customer/meetAppointment", {
+  //       appointmentId: tempAppointmentId,
+  //       paymentStatus: paymentStatus,
+  //       amount: amount,
+  //     })
+  //     .then(function (response) {
+  //       console.log(response.data.paymentStatus);
+  //       setData(response);
+  //       // if(response.status === 201 ){
+  //       //   console.log("Succesfull");
+  //       // }
+  //     })
+  //     .catch(function (error) {
+  //       console.log(error);
+  //     });
+  //   // if ( tempAppointmentId === data.data.appointmentId ){
+  //   //   setPaymentStatus(false);
+  //   //   // console.log(paymentStatus);
+  //   // }
+  //   // else{
+  //   //   console.log(paymentStatus);
+  //   // }
+  // };
 
   return (
     <div className="bg-back-blue">
@@ -500,10 +541,14 @@ function VideoConference() {
                       // defaultValue={"Male"}
                       onChange={(e) => {
                         setDoctor(e.target.value);
+                        console.log("Key It", doctor);
+                        findDoctorCharge(e.target.value);
                       }}
                     >
-                      {appConst.doctors.map((data) => (
-                        <MenuItem value={data.name}>{data.name}</MenuItem>
+                      {doctors.map((data) => (
+                        <MenuItem key={data.userId} value={data.userId}>
+                          {data.name}
+                        </MenuItem>
                       ))}
                     </Select>
                   </FormControl>
@@ -581,19 +626,21 @@ function VideoConference() {
               <div className="pb-10 border-b border-slate-500  ">
                 <div className="flex justify-between ">
                   <p className="text-black">Appointment Fee</p>
-                  <p className="text-black">600.00</p>
+                  <p className="text-black">{charges[0].charge}</p>
                 </div>
                 <div className="flex justify-between ">
                   <p className="text-black">Doctor Fee</p>
-                  <p className="text-black">1700.00</p>
+                  <p className="text-black">{doctorCharge}</p>
                 </div>
               </div>
               {/* Bill total */}
               <div className="flex justify-between pt-4 pb-4 font-semi-bold text-xl ">
                 <p className="text-black">Total</p>
-                <p className="text-lime-500">2300.00</p>
+                <p className="text-lime-500">
+                  {charges[0].charge + doctorCharge}
+                </p>
               </div>
-              <div className="w-full flex-col justify-between md:my-2 pb-2 ">
+              {/* <div className="w-full flex-col justify-between md:my-2 pb-2 ">
                 <p className="text-black font-semibold pb-2">
                   Check Your E mail and Please Enter the Appointment ID Here
                 </p>
@@ -606,20 +653,20 @@ function VideoConference() {
                     setTempAppointmentId(e.target.value);
                   }}
                 />
-              </div>
-              <Grid container spacing={1}>
-                <Grid
-                  className="flex justify-center"
-                  item
-                  lg={6}
-                  md={6}
-                  sm={12}
-                  xs={12}
-                >
-                  <Button variant="contained" onClick={bookAnAppointment}>
-                    Pay on Door
-                  </Button>
-                </Grid>
+              </div> */}
+              <Grid container spacing={1} className="flex justify-center">
+                {/* <Grid
+                className="flex justify-center"
+                item
+                lg={6}
+                md={6}
+                sm={12}
+                xs={12}
+              >
+                <Button variant="contained" onClick={bookAnAppointment}>
+                  Pay on Door
+                </Button>
+              </Grid> */}
                 <Grid
                   className="flex justify-center"
                   item

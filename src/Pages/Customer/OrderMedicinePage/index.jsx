@@ -141,7 +141,7 @@ function OrderMedicine() {
                       xs={12}
                     >
                       <Button type="submit" variant="contained">
-                        Request Order
+                        Check Order
                       </Button>
                     </Grid>
                   </Grid>

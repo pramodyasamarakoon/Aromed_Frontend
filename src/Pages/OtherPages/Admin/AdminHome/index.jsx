@@ -40,8 +40,38 @@ function Row(props) {
   const { row } = props;
   const [open, setOpen] = React.useState(false);
 
-  const deleteUser = () => {
-    window.alert("Delete");
+  const deleteUser = (userId) => {
+    console.log(userId);
+    axios
+      .delete(`http://localhost:8080/user/${userId}`)
+      .then((response) => {
+        console.log(response.data); // Successfully user removed
+        // perform any additional actions you need after the user is deleted
+        toast.success("Successfully User Removed", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      })
+      .catch((error) => {
+        console.log(error.response.data); // Error
+        toast.error("Error", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      });
+    window.location.reload();
   };
 
   return (
@@ -57,19 +87,19 @@ function Row(props) {
           {row.name}
         </TableCell>
         <TableCell align="center">{row.userType}</TableCell>
-        {/* <TableCell align="right">
+        <TableCell align="right">
           <Button
             variant="outlined"
             sx={{
               padding: "2px 4px",
               fontSize: "0.8rem",
             }}
-            onClick={(row) => console.log({ row })}
+            onClick={() => deleteUser(row.userId)}
             // type="submit"
           >
             Remove
           </Button>
-        </TableCell> */}
+        </TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -113,6 +143,7 @@ function Row(props) {
 
 function AdminHome() {
   // const [user, setUser] = useState(UserData);
+  const [loaded, setLoaded] = useState(true);
   const [searchPhrase, setSearchPhrase] = useState("");
   const [userType, setUserType] = useState();
   const [name, setName] = useState();
@@ -140,72 +171,76 @@ function AdminHome() {
       .catch((error) => console.log(error));
   }, []);
 
-  const checkUserName = async () => {
-    window.alert("Found", userName);
-  };
+  // const checkUserName = async () => {
+  //   window.alert("Found", userName);
+  // };
 
   const addUser = async () => {
-    if (password === confirmPassword) {
-      console.log("password match");
-      toast.success("User Successfully Registered!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
-      let res = await axios
-        .post("http://localhost:8080/user/addUser", {
-          userType: userType,
-          name: name,
-          mNumber: mNumber,
-          email: email,
-          address: address,
-          gender: gender,
-          age: age,
-          nic: nic,
-          userName: userName,
-          password: password,
-          specialisation: specialisation,
-          qualification: qualification,
-          experience: experience,
-          note: note,
-          charge: charge,
-        })
-        .then(function (response) {
-          console.log(response);
-          // setData(response);
-          if (response.status === 201) {
-            console.log("Data Successfully Added", response.data.userId);
-            // setBillHandler(true);
-            // appConst.doctors.forEach((element, index) => {
-            //   if (doctor === appConst.doctors.find(doctor)) {
-            //     console.log("Success");
-            //   }
-            //   console.log("Error");
-            // });
-          }
-        })
-        .catch(function (error) {
-          console.log(error);
+    const user = {
+      userType: userType,
+      name: name,
+      mNumber: mNumber,
+      email: email,
+      address: address,
+      gender: gender,
+      age: age,
+      nic: nic,
+      userName: userName,
+      password: password,
+      confirmPassword: confirmPassword,
+      specialisation: specialisation,
+      qualification: qualification,
+      experience: experience,
+      note: note,
+      charge: charge,
+    };
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/user/addUser",
+        user
+      );
+      console.log("Add user Res", response);
+      if (response.status === 200) {
+        toast.success("User created successfully!", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
         });
-      // window.location.reload();
-    } else {
-      console.log("password does not match");
-      toast.error("Password does not match!", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "dark",
-      });
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error(error.response.data);
+      if (error.response.data == "UserName already exists") {
+        toast.error("UserName already exists", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+      if (error.response.data == "Password doesn't match") {
+        toast.error("Password doesn't match", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
     }
+
     // window.alert(password);
   };
 
@@ -742,8 +777,8 @@ function AdminHome() {
                 >
                   <Button
                     variant="contained"
-                    onClick={checkUserName}
-                    // type="submit"
+                    // onClick={addUser}
+                    type="submit"
                   >
                     Add User
                   </Button>

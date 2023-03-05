@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import NavBar from "../../Lib/NavBar";
 import Hero from "../../Lib/Hero";
 import HeaderBox from "../../components/HeaderBox";
@@ -37,17 +37,6 @@ import { DoctorData } from "../../Lib/Const/DoctorData";
 import Paper from "@mui/material/Paper";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-
-// Check Appointment ID
-const checkAppointment = async (ID, e) => {
-  // e.preventDefault("");
-  let appointmentID = ID;
-
-  if (appointmentID != undefined) {
-    window.alert(appointmentID);
-    // window.alert(isValid)
-  }
-};
 
 function Row(props) {
   const { row } = props;
@@ -146,6 +135,47 @@ function LandingPage() {
   const [password, setPassword] = useState();
   const [searchPhrase, setSearchPhrase] = useState("");
   const [searchSpecial, setSearchSpecial] = useState("");
+  const navigate = useNavigate();
+  const today = new Date().toISOString().slice(0, 10);
+
+  // Check Appointment ID
+  const checkAppointment = async (ID, e) => {
+    let appointmentID = ID;
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/customer/appointmentId/${appointmentID}`
+      );
+      const result = response.data; // log the string return from the server
+      if (result == "") {
+        toast.error("Incorrect Appointment Number", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+      // else {
+      //   console.log(result);
+      //   navigate(`/NotTodayAppointment?date=${result.date}`);
+      // }
+      else if (result.date === today) {
+        console.log("today");
+
+        navigate(
+          `/WaitingForAppointment?appointmentNumber=${result.appointmentNumber}&appointmentId=${result.appointmentId}`
+        );
+      } else {
+        // console.log("not today");
+        navigate(`/NotTodayAppointment?date=${result.date}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const signIn = () => {
     axios
@@ -176,16 +206,16 @@ function LandingPage() {
             theme: "dark",
           });
         } else if (response.data == "Login Successful") {
-          toast.success("Login Successful", {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          });
+          // toast.success("Login Successful", {
+          //   position: "top-right",
+          //   autoClose: 5000,
+          //   hideProgressBar: false,
+          //   closeOnClick: true,
+          //   pauseOnHover: true,
+          //   draggable: true,
+          //   progress: undefined,
+          //   theme: "dark",
+          // });
         }
       })
       .catch((error) => {
@@ -241,8 +271,8 @@ function LandingPage() {
         <HeaderBox header="Check Your Appointment" />
         <div>
           <p className={` p-4 pt-0 `}>
-            Do you want to check about your previous order? You can enter your
-            Appointment ID and get updated about your order.
+            Do you want to check about your previous Appointment? You can enter
+            your Appointment ID and get updated about your order.
           </p>
           <div className="bg-white">
             <ValidatorForm

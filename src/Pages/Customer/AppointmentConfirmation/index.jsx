@@ -5,8 +5,15 @@ import HeaderBox from "../../../components/HeaderBox";
 import Logo from "../../../components/Logo";
 import Button from "../../../components/MainButton";
 import Footer from "../../../Lib/Footer";
+import { useLocation } from "react-router-dom";
 
 function AppointmentConfirmation() {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const appointmentId = queryParams.get("appointmentId");
+  const date = queryParams.get("date");
+  const appointmentNumber = queryParams.get("appointmentNumber");
+
   return (
     <div className="bg-back-blue">
       <div className="max-w-[1240px] mx-auto ">
@@ -27,8 +34,9 @@ function AppointmentConfirmation() {
         </div>
 
         {/* Date */}
-        <div className="bg-box-blue/30 p-4 px-12 ">
-          <p className="font-bold">Wed, 13th October, 2022</p>
+        <div className="bg-box-blue/30 p-4 px-12 flex ">
+          <p className="p-2 sm:p-4">Your Appointment Date - </p>
+          <p className="p-4 pl-2 font-bold">{date}</p>
         </div>
 
         {/* Content */}
@@ -36,7 +44,7 @@ function AppointmentConfirmation() {
           <div className="sm:flex justify-center text-xl border-2 rounded-lg ">
             <p className="p-2 sm:p-4">Your Appointment Number is</p>
             <p className="p-2 sm:px-8 font-bold sm:p-4 text-4xl sm:text-xl ">
-              15
+              {appointmentNumber}
             </p>
           </div>
         </div>
@@ -44,7 +52,7 @@ function AppointmentConfirmation() {
           <div className="sm:flex justify-center text-xl border-2 rounded-lg ">
             <p className="p-2 sm:p-4">Your Appointment ID is</p>
             <p className="p-2 sm:px-8 font-bold sm:p-4 text-4xl sm:text-xl ">
-              123456789
+              {appointmentId}
             </p>
           </div>
         </div>
