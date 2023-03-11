@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import HeaderBox from "../../../components/HeaderBox";
-// import Button from "../../../components/MainButton";
 import Footer from "../../../Lib/Footer";
 import NavBar from "../../../Lib/NavBar";
 import { getAllDoctors } from "../../../Lib/Const/const";
@@ -37,12 +36,26 @@ function VideoConference() {
   const [snackBar, setSnackBar] = useState(false);
   const videoConference = true;
   const [amount, setAmount] = useState(2300);
-  // const [data, setData] = useState();
   const [billHandler, setBillHandler] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState(false);
   const [tempAppointmentId, setTempAppointmentId] = useState();
   const [doctorCharge, setDoctorCharge] = useState();
   const [data, setData] = useState();
+  const [availableDates, setAvailableDates] = useState([]);
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -53,6 +66,30 @@ function VideoConference() {
     };
     fetchData();
   }, []);
+
+  const loadDoctorAvailability = async (doctorId) => {
+    let availability = "Virtual";
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/doctorAvailability/getAvailabilityForCustomers?doctorId=${doctorId}&availability=${availability}`
+      );
+      setAvailableDates(response.data);
+      console.log("Result", response.data);
+    } catch (error) {
+      console.log(error);
+      toast.error("Error", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
+    // console.log("Result", availableDates);
+  };
 
   const findDoctorCharge = (id) => {
     const doctorId = doctor;
@@ -190,33 +227,6 @@ function VideoConference() {
     //   console.log(paymentStatus);
     // }
   };
-
-  // const bookAnAppointmentWithPayment = async () => {
-  //   setPaymentStatus(true);
-  //   let res = await axios
-  //     .post("http://localhost:8080/customer/meetAppointment", {
-  //       appointmentId: tempAppointmentId,
-  //       paymentStatus: paymentStatus,
-  //       amount: amount,
-  //     })
-  //     .then(function (response) {
-  //       console.log(response.data.paymentStatus);
-  //       setData(response);
-  //       // if(response.status === 201 ){
-  //       //   console.log("Succesfull");
-  //       // }
-  //     })
-  //     .catch(function (error) {
-  //       console.log(error);
-  //     });
-  //   // if ( tempAppointmentId === data.data.appointmentId ){
-  //   //   setPaymentStatus(false);
-  //   //   // console.log(paymentStatus);
-  //   // }
-  //   // else{
-  //   //   console.log(paymentStatus);
-  //   // }
-  // };
 
   return (
     <div className="bg-back-blue">
@@ -541,8 +551,9 @@ function VideoConference() {
                       // defaultValue={"Male"}
                       onChange={(e) => {
                         setDoctor(e.target.value);
-                        console.log("Key It", doctor);
+                        console.log("Key It", e.target.value);
                         findDoctorCharge(e.target.value);
+                        loadDoctorAvailability(e.target.value);
                       }}
                     >
                       {doctors.map((data) => (
@@ -556,15 +567,15 @@ function VideoConference() {
                 <Grid
                   className="flex items-center"
                   item
-                  lg={6}
+                  lg={12}
                   md={6}
                   sm={12}
                   xs={12}
                 >
                   <p className="text-black w-full px-2 font-semibold">
-                    Appointment Date
+                    Select the Appointment Date
                   </p>
-                  <FormControl fullWidth>
+                  {/* <FormControl fullWidth>
                     <input
                       name="date"
                       type="date"
@@ -575,7 +586,55 @@ function VideoConference() {
                         setDate(e.target.value);
                       }}
                     />
-                  </FormControl>
+                  </FormControl> */}
+                </Grid>
+                <Grid
+                  className="flex items-center justify-evenly"
+                  item
+                  lg={12}
+                  md={6}
+                  sm={12}
+                  xs={12}
+                >
+                  <Grid
+                    container
+                    spacing={1}
+                    className="flex items-center justify-center"
+                  >
+                    {availableDates.map((data) => {
+                      return (
+                        <Grid
+                          key={data.availabilityId}
+                          className="flex w-full cursor-pointer"
+                          item
+                          lg={1}
+                          alignItems="center"
+                          justifyContent="center"
+                          onClick={() => setDate(data.fullDate)}
+                        >
+                          {date == data.fullDate ? (
+                            <div className="w-full h-full items-center text-center bg-box-blue">
+                              <p className="pt-2" style={{ fontSize: "15px" }}>
+                                {months[parseInt(data.month) - 1]}
+                              </p>
+                              <p className="" style={{ fontSize: "40px" }}>
+                                {data.date}
+                              </p>
+                            </div>
+                          ) : (
+                            <div className="w-full h-full items-center text-center bg-back-blue">
+                              <p className="pt-2" style={{ fontSize: "15px" }}>
+                                {months[parseInt(data.month) - 1]}
+                              </p>
+                              <p className="" style={{ fontSize: "40px" }}>
+                                {data.date}
+                              </p>
+                            </div>
+                          )}
+                        </Grid>
+                      );
+                    })}
+                  </Grid>
                 </Grid>
                 <Grid
                   // className="flex items-center"
@@ -587,7 +646,7 @@ function VideoConference() {
                 >
                   <TextValidator
                     // sx={{ width: "90%" }}
-                    className="w-full mb-4 md:mb-0  "
+                    className="w-full mb-4 mt-2 md:mb-0 "
                     label="If Any Message?"
                     fullWidth
                     variant="outlined"

@@ -16,6 +16,7 @@ import {
   Select,
 } from "@mui/material";
 import axios, * as others from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 function OrderMedicine() {
   const [orderID, setOrderID] = useState();
@@ -29,7 +30,7 @@ function OrderMedicine() {
   const [snackBar, setSnackBar] = useState(false);
   const [data, setData] = useState();
   const [checkAppointmentId, setCheckAppointmentId] = useState();
-  const requestStatus = true;
+  const requestStatus = false;
   const placedStatus = false;
   const navigate = useNavigate();
 
@@ -54,7 +55,7 @@ function OrderMedicine() {
   };
 
   const onSubmit = async () => {
-    window.alert(mNumber);
+    // window.alert(mNumber);
     setSnackBar(true);
     let res = await axios
       .post("http://localhost:8080/order/createOrder", {
@@ -71,12 +72,28 @@ function OrderMedicine() {
       .then(function (response) {
         console.log(response);
         setData(response);
-        if (response.status === 201) {
-          window.alert("Order Success");
-        }
+        toast.success("Successfuly Requested", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       })
       .catch(function (error) {
-        console.log(error);
+        toast.error("Error", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
       });
   };
 
@@ -369,6 +386,7 @@ function OrderMedicine() {
           </div>
         </div>
       </div>
+      <ToastContainer />
       <Footer />
     </div>
   );

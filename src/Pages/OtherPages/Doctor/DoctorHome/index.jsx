@@ -58,7 +58,7 @@ function DoctorHome() {
           },
         })
         .then((response) => {
-          // console.log(response.data);
+          console.log(response.data);
           setAppointments(response.data);
         })
         .catch((error) => {

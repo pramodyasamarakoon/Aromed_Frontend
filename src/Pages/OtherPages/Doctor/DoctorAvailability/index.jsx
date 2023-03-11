@@ -1,93 +1,127 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import HeaderBox from "../../../../components/HeaderBox";
 import Logo from "../../../../components/Logo";
-import Button from "../../../../components/MainButton";
-import SuperButton from "../../../../components/SuperButton";
+import Button from "@mui/material/Button";
 import Footer from "../../../../Lib/Footer";
-import { formatDate } from "@fullcalendar/core";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
 import {
-  INITIAL_EVENTS,
-  createEventId,
-} from "../../../../Lib/Const/Event_Utils";
-import { Grid } from "@mui/material";
-import moment from "moment";
-import AppointmentDialog from "./AppointmentDialog";
+  Grid,
+  Modal,
+  Typography,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormControl,
+  FormLabel,
+} from "@mui/material";
+import axios from "axios";
+import { ValidatorForm } from "react-material-ui-form-validator";
+import { toast } from "react-toastify";
 
 function DoctorAvailability() {
-  const [weekendsVisible, setWeekendsVisible] = useState(true);
-  const [currentEvents, setCurrentEvents] = useState([]);
-  const events = [{ title: "Meeting", start: new Date() }];
-  const [open, setOpen] = useState(false);
-  const [selectedDate, setSelectedDate] = useState("");
+  const moment = require("moment");
+  const [doctor, setDoctor] = useState("fbd3c3c3");
+  const [availabilities, setAvailabilities] = useState([]);
+  const [value, setValue] = useState("On Leave");
+  const [popUpData, setPopUpData] = useState({
+    open: false,
+    date: null,
+    availability: null,
+    id: null,
+  });
+  const [id, setId] = useState();
+  const months = [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ];
 
-  const handleWeekendsToggle = () => {
-    setWeekendsVisible(!weekendsVisible);
-  };
-
-  const handleDateSelect = (selectInfo) => {
-    const handleClickOpen = () => {
-      setSelectedDate(selectInfo.startStr);
-      setOpen(true);
-    };
-
-    const handleClose = () => {
-      setOpen(false);
-    };
-
-    let title = prompt("Please enter a new title for your event");
-    // let title = now();
-    // let title = window.alert("Helloo");
-    let calendarApi = selectInfo.view.calendar;
-    console.log("selectInfo", selectInfo.view.calendar);
-
-    calendarApi.unselect(); // clear date selection
-
-    if (title) {
-      calendarApi.addEvent({
-        id: createEventId(),
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay,
-      });
-
-      handleClickOpen();
+  useEffect(() => {
+    async function fetchAvailabilities() {
+      // get availability for next 3 weeks
+      try {
+        const response = await axios.get(
+          "http://localhost:8080/doctorAvailability/getAvailability",
+          {
+            params: {
+              doctorId: doctor,
+            },
+          }
+        );
+        setAvailabilities(response.data);
+        console.log("Ava Res", response.data);
+      } catch (error) {
+        console.error("Error", error);
+      }
     }
+    fetchAvailabilities();
+  }, []);
 
-    // handleClickOpen();
-
-    // return (
-    //   <AppointmentDialog
-    //     open={true}
-    //     handleClose={handleClose}
-    //     selectedDate={selectedDate}
-    //   />
-    // );
+  // when click on the date this will update
+  const availabilityPopUp = (open, date, availability, id) => {
+    setPopUpData({
+      open: open,
+      date: date,
+      availability: availability,
+      id: id,
+    });
   };
 
-  const handleEventClick = (clickInfo) => {
-    // if (confirm(`Are you sure you want to delete the event '${clickInfo.event.title}'`)) {
-    clickInfo.event.remove();
-    // }
+  // Availability Update PUT method and reload
+  const updateAvailability = async (availabilityId, availability) => {
+    console.log("availabilityId", availabilityId);
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/doctorAvailability/updateAvailability?availabilityId=${availabilityId}&availability=${availability}`
+      );
+      console.log("Result When Update", response.data);
+
+      loadData();
+      setPopUpData({
+        open: false,
+      });
+    } catch (error) {
+      console.log(error);
+      toast.error("Error", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
   };
 
-  const handleEvents = (events) => {
-    setCurrentEvents({ events });
+  // load availability data
+  const loadData = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8080/doctorAvailability/getAvailability",
+        {
+          params: {
+            doctorId: doctor,
+          },
+        }
+      );
+      setAvailabilities(response.data);
+      console.log("Ava Res", response.data);
+    } catch (error) {
+      console.error("Error", error);
+    }
   };
 
-  function renderEventContent(eventInfo) {
-    return (
-      <>
-        <b>{eventInfo.timeText}</b>
-        <i>{eventInfo.event.title}</i>
-      </>
-    );
-  }
   return (
     <div className="bg-back-blue  ">
       {/* <NavBar/> */}
@@ -115,10 +149,11 @@ function DoctorAvailability() {
         </div>
       </div>
 
+      {/* Availability */}
       <div className="max-w-[1000px] mx-auto mt-[100px] ">
         <HeaderBox header="Availability" />
         <div className="bg-box-blue/50">
-          <Grid container>
+          <Grid spacing={2} container>
             <Grid
               className="flex items-center justify-center p-4"
               item
@@ -127,128 +162,181 @@ function DoctorAvailability() {
               sm={12}
               xs={12}
             >
-              <h1>Set your availability here</h1>
-            </Grid>
-            <Grid className="p-4 px-8" item lg={12} md={12} sm={12} xs={12}>
-              <FullCalendar
-                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-                headerToolbar={{
-                  left: "prev,next",
-                  center: "title",
-                  // right: "dayGridMonth,timeGridWeek,timeGridDay",
-                  right: "today",
-                }}
-                height="500px"
-                validRange={{
-                  start: moment().add(14, "days").format("YYYY-MM-DD"), // two weeks from today
-                  end: moment().add(1, "year").format("YYYY-MM-DD"), // one year from today
-                }}
-                visibleRange={{
-                  start: moment().add(1, "weeks").startOf("week").toDate(),
-                  end: moment().add(2, "weeks").endOf("week").toDate(),
-                }}
-                initialDate={moment().add(2, "weeks").startOf("week").toDate()}
-                initialView="dayGridMonth"
-                editable={true}
-                selectable={true}
-                selectMirror={true}
-                dayMaxEvents={true}
-                weekends={weekendsVisible}
-                initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
-                select={handleDateSelect}
-                eventContent={renderEventContent} // custom render function
-                eventClick={handleEventClick}
-                eventsSet={handleEvents} // called after events are initialized/added/changed/removed
-                /* you can update a remote database when these fire:
-          eventAdd={function(){}}
-          eventChange={function(){}}
-          eventRemove={function(){}}
-          */
-              ></FullCalendar>
+              <h1 className="mx-8">
+                You can set the availability here. For the next week, you cannot
+                edit your availability. It has already been released to
+                customers for bookings. You can set your availability for the
+                following two weeks here.
+              </h1>
             </Grid>
           </Grid>
-        </div>
-      </div>
 
-      {/* Select Dates */}
-      <div className="max-w-[1240px] mx-auto mt-[100px] ">
-        <HeaderBox header="Availability for this week" />
-        <div className="bg-box-blue/30 py-12 ">
-          <div className="flex justify-evenly ">
-            <div className="w-[800px] px-8 py-8 text-xl bg-box-blue rounded-lg ">
-              <table className="auto w-full ">
-                <tr className="border-0 border-b-2 border-slate-500 ">
-                  <td className="w-[200px] text-white ">Monday</td>
-                  <td>
-                    <SuperButton />
-                  </td>
-                </tr>
-                <tr className="border-0 border-b-2 border-slate-500 ">
-                  <td className="w-[200px] text-white ">Tuesday</td>
-                  <td>
-                    <SuperButton />
-                  </td>
-                </tr>
-                <tr className="border-0 border-b-2 border-slate-500 ">
-                  <td className="w-[200px] text-white ">Wednesday</td>
-                  <td>
-                    <SuperButton />
-                  </td>
-                </tr>
-                <tr className="border-0 border-b-2 border-slate-500 ">
-                  <td className="w-[200px] text-white ">Thursday</td>
-                  <td>
-                    <SuperButton />
-                  </td>
-                </tr>
-                <tr className="border-0 border-b-2 border-slate-500 ">
-                  <td className="w-[200px] text-white ">Friday</td>
-                  <td>
-                    <SuperButton />
-                  </td>
-                </tr>
-                <tr className="border-0 border-b-2 border-slate-500 ">
-                  <td className="w-[200px] text-white ">Saturday</td>
-                  <td>
-                    <SuperButton />
-                  </td>
-                </tr>
-                <tr className="border-0 border-b-2 border-slate-500 ">
-                  <td className="w-[200px] text-white ">Sunday</td>
-                  <td>
-                    <SuperButton />
-                  </td>
-                </tr>
-              </table>
-              <Button extraTailwind="mt-12" value="Save" />
+          <Grid container spacing={2} className="p-4">
+            {availabilities.map((availability, index) =>
+              index < 7 ? (
+                <Grid
+                  key={availability.availabilityId}
+                  className="flex w-full "
+                  item
+                  lg={2}
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <div
+                    className="w-full h-full items-center text-center bg-back-blue/50"
+                    style={{ border: "2px solid #040C18" }}
+                  >
+                    <p className="pt-2" style={{ fontSize: "15px" }}>
+                      {months[parseInt(availability.month) - 1]}
+                    </p>
+                    <p className="" style={{ fontSize: "40px" }}>
+                      {availability.date}
+                    </p>
+                    <p className="p-2" style={{ fontSize: "15px" }}>
+                      {availability.availability}
+                    </p>
+                  </div>
+                </Grid>
+              ) : (
+                <Grid
+                  key={availability.availabilityId}
+                  className="flex w-full cursor-pointer "
+                  item
+                  lg={2}
+                  alignItems="center"
+                  justifyContent="center"
+                  onClick={() =>
+                    availabilityPopUp(
+                      true,
+                      availability.fullDate,
+                      availability.availability,
+                      availability.id
+                    )
+                  }
+                >
+                  <div className="w-full h-full items-center text-center bg-back-blue">
+                    <p className="pt-2" style={{ fontSize: "15px" }}>
+                      {months[parseInt(availability.month) - 1]}
+                    </p>
+                    <p className="" style={{ fontSize: "40px" }}>
+                      {availability.date}
+                    </p>
+                    <p className="p-2" style={{ fontSize: "15px" }}>
+                      {availability.availability}
+                    </p>
+                  </div>
+                </Grid>
+              )
+            )}
+          </Grid>
+
+          {/* Pop Up */}
+          <div
+            className={`fixed z-10  w-full  h-full  ${
+              popUpData.open ? "flex" : "hidden"
+            } flex-col justify-center  bg-back-blue`}
+          >
+            <div
+              className={`fixed z-50 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[400px]  h-auto py-4  m-auto flex-col justify-center  bg-box-blue rounded-sm`}
+            >
+              <Grid container className="p-4">
+                <Grid
+                  className="flex items-center justify-center p-2"
+                  item
+                  lg={12}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <p className="justify-center text-xl ">Availability</p>
+                </Grid>
+                <Grid
+                  className="flex items-center justify-center pb-2"
+                  item
+                  lg={12}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                >
+                  <p className="justify-center ">{popUpData.date}</p>
+                </Grid>
+                <ValidatorForm
+                  onSubmit={() => {
+                    updateAvailability(popUpData.id, popUpData.availability);
+                  }}
+                  className=" mx-auto py-4"
+                >
+                  <Grid
+                    className="flex items-center justify-center pb-4"
+                    item
+                    lg={12}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <FormControl component="fieldset">
+                      {/* <FormLabel component="legend">Gender</FormLabel> */}
+                      <RadioGroup
+                        // aria-label="gender"
+                        row
+                        name="Availability"
+                        value={popUpData.availability}
+                        onChange={(e) => setValue(e.target.value)}
+                      >
+                        <FormControlLabel
+                          value="On Leave"
+                          control={<Radio size="small" color="primary" />}
+                          display="inline"
+                          label="On Leave"
+                          onChange={(e) =>
+                            updateAvailability(popUpData.id, e.target.value)
+                          }
+                        />
+                        <FormControlLabel
+                          value="Virtual"
+                          control={<Radio size="small" color="primary" />}
+                          display="inline"
+                          label="Virtual"
+                          onChange={(e) =>
+                            updateAvailability(popUpData.id, e.target.value)
+                          }
+                        />
+                        <FormControlLabel
+                          value="Physical"
+                          control={<Radio size="small" color="primary" />}
+                          display="inline"
+                          label="Physical"
+                          onChange={(e) =>
+                            updateAvailability(popUpData.id, e.target.value)
+                          }
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                  </Grid>
+                  {/* <Grid
+                    className="flex items-center justify-evenly pb-2"
+                    item
+                    lg={12}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <Button
+                      onClick={setPopUpData({
+                        open: false,
+                      })}
+                      variant="contained"
+                    >
+                      Cancel
+                    </Button>
+                  </Grid> */}
+                </ValidatorForm>
+              </Grid>
             </div>
           </div>
         </div>
-
-        {/* Table */}
-        <div className="bg-box-blue/30 mt-12 py-12 px-32 ">
-          <div className="w-full mx-auto pt-24 pb-16 px-8 my-8 bg-white font-bold rounded-xl ">
-            <div className="pb-16   ">
-              <table className="table-auto w-full border-collapse border border-slate-500 ">
-                <thead>
-                  <th className=" border border-slate-600 bg-slate-400 ">
-                    Date
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Availability
-                  </th>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Monday</td>
-                    <td>Video Conference</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
       </div>
+
       <Footer />
     </div>
   );
