@@ -58,7 +58,7 @@ function App() {
             element={<BeforeLoginAppointment />}
           />
           <Route
-            path="/SuccessfulOrderRequest"
+            path="/orderMedicine/SuccessfulOrderRequest"
             element={<SuccessfulOrderRequest />}
           />
           <Route path="/OrderProcessing" element={<OrderProcessing />} />

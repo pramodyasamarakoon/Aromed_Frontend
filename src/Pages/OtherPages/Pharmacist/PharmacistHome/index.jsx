@@ -1,264 +1,578 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import { Link } from "react-router-dom";
 import HeaderBox from "../../../../components/HeaderBox";
-import Button from "../../../../components/MainButton";
+import Logo from "../../../../components/Logo";
 import CheckFormBox from "../../../../Lib/CheckFormBox";
 import Footer from "../../../../Lib/Footer";
-
-/* Data for Appointment List */
-const APPOINTMENT_LIST = [
-  {
-    id: 15442,
-    cName: "Pramodya Samarakoon",
-    Email: "pramodyasamarakoon2516@gmail.com",
-    mobile: 770891382,
-    prescription: "Download",
-    paymentStatus: "Paid",
-  },
-  {
-    id: 15442,
-    cName: "Pramodya Samarakoon",
-    Email: "pramodyasamarakoon2516@gmail.com",
-    mobile: 770891382,
-    prescription: "Download",
-    paymentStatus: "On Door",
-  },
-  {
-    id: 15442,
-    cName: "Pramodya Samarakoon",
-    Email: "pramodyasamarakoon2516@gmail.com",
-    mobile: 770891382,
-    prescription: "Download",
-    paymentStatus: "Paid",
-  },
-  {
-    id: 15442,
-    cName: "Pramodya Samarakoon",
-    Email: "pramodyasamarakoon2516@gmail.com",
-    mobile: 770891382,
-    prescription: "Download",
-    paymentStatus: "On Door",
-  },
-  {
-    id: 15442,
-    cName: "Pramodya Samarakoon",
-    Email: "pramodyasamarakoon2516@gmail.com",
-    mobile: 770891382,
-    prescription: "Download",
-    paymentStatus: "Paid",
-  },
-];
+import NavBar from "../../../../Lib/NavBar";
+import {
+  Button,
+  Box,
+  Paper,
+  Collapse,
+  Grid,
+  IconButton,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
 
 function PharmacistHome() {
+  const [requestedOrders, setRequestedOrders] = useState([]);
+  const [confirmedOrders, setConfirmedOrders] = useState([]);
+  const [currentOrderId, setCurrentOrderId] = useState();
+  const [medicine, setMedicine] = useState({
+    medicine: "",
+    price: 0,
+  });
+  const [billData, setBillData] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [reqbillHandler, setReqBillHandler] = useState(false);
+  const [plabillHandler, setPlaBillHandler] = useState(false);
+  const [PlacedCurrentOrderId, setPlacedCurrentOrderId] = useState();
+  const [placedBillData, setPlacedBillData] = useState([]);
+  const [placedTotal, setPlacedTotal] = useState(0);
+
+  useEffect(() => {
+    loadRequestedOrders();
+    loadConfirmedOrders();
+  }, []);
+
+  // load requested orders
+  const loadRequestedOrders = async () => {
+    let requestStatus = false;
+    let placedStatus = false;
+    let confirmedStatus = false;
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/order/getOrders?requestStatus=${requestStatus}&placedStatus=${placedStatus}&confirmedStatus=${confirmedStatus}`
+      );
+      setRequestedOrders(response.data);
+      console.log("Result", response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // load confirmed orders
+  const loadConfirmedOrders = async () => {
+    let requestStatus = true;
+    let placedStatus = true;
+    let confirmedStatus = false;
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/order/getOrders?requestStatus=${requestStatus}&placedStatus=${placedStatus}&confirmedStatus=${confirmedStatus}`
+      );
+      setConfirmedOrders(response.data);
+      console.log("Confirmed Result", response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //  Table Row onclick function
+  const rowClick = async (orderId) => {
+    setCurrentOrderId(orderId);
+    getOrderByOrderId(orderId);
+    setReqBillHandler(true);
+  };
+
+  // Palced Table Row onclick function
+  const placedRowClick = async (orderId) => {
+    setPlacedCurrentOrderId(orderId);
+    getPlacedOrderByOrderId(orderId);
+    setPlaBillHandler(true);
+  };
+
+  // Add medicines
+  const addMedicineData = async () => {
+    console.log(currentOrderId);
+    if (currentOrderId !== null) {
+      try {
+        axios
+          .post(
+            `http://localhost:8080/order/addMedicine?orderId=${currentOrderId}`,
+            medicine
+          )
+          .then((res) => {
+            console.log(res.data);
+            setMedicine({ medicine: "", price: 0 });
+            getOrderByOrderId(currentOrderId);
+            // setBillHandler(true);
+          })
+          .catch((err) => {
+            console.error(err);
+            // Do something on error, e.g. show an error message
+          });
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      toast.error("First choose any order", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
+    console.log("Bill", billData);
+  };
+
+  // Get order by order id
+  const getOrderByOrderId = async (orderId) => {
+    console.log("Order ID", orderId);
+    try {
+      axios
+        .get(`http://localhost:8080/order/getOrderId?orderId=${orderId}`)
+        .then((res) => {
+          setBillData(res.data.medicineList);
+          if (res.data.medicineList !== null) {
+            console.log("Bill Data", billData);
+            // set total
+            let totalPrice = res.data.medicineList.reduce((total, data) => {
+              return total + data.price + 500;
+            }, 0);
+            setTotal(totalPrice);
+            console.log("Total", totalPrice);
+          } else {
+            setTotal(0);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          // Do something on error, e.g. show an error message
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Get placed order by order id
+  const getPlacedOrderByOrderId = async (orderId) => {
+    try {
+      axios
+        .get(`http://localhost:8080/order/getOrderId?orderId=${orderId}`)
+        .then((res) => {
+          setPlacedBillData(res.data.medicineList);
+          if (res.data.medicineList !== null) {
+            console.log("placedBillData", placedBillData);
+            // set total
+            let totalPrice = res.data.medicineList.reduce((total, data) => {
+              return total + data.price;
+            }, 0);
+            setPlacedTotal(totalPrice);
+            console.log("Total", totalPrice);
+          } else {
+            setPlacedTotal(0);
+          }
+        })
+        .catch((err) => {
+          console.error(err);
+          // Do something on error, e.g. show an error message
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // submit medicines
+  const submitMedicines = async () => {
+    if (total !== 0) {
+      try {
+        axios
+          .put(
+            `http://localhost:8080/order/updateMedicines?orderId=${currentOrderId}&total=${total}&requestStatus=true`
+          )
+          .then((res) => {
+            loadRequestedOrders();
+            toast.success("Successfully Submitted", {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            });
+            setReqBillHandler(false);
+          })
+          .catch((err) => {
+            console.error(err);
+            // Do something on error, e.g. show an error message
+          });
+      } catch (error) {
+        console.log(error);
+        toast.error(
+          { error },
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          }
+        );
+      }
+    } else {
+      toast.error("Please add medicines", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
+  };
+
+  // confirm order
+  const placingOrder = async () => {
+    try {
+      axios
+        .put(
+          `http://localhost:8080/order/confirmingOrders?orderId=${PlacedCurrentOrderId}&confirmedStatus=true`
+        )
+        .then((res) => {
+          loadConfirmedOrders();
+          toast.success("Successfully Submitted", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+          setPlaBillHandler(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          // Do something on error, e.g. show an error message
+        });
+    } catch (error) {
+      console.log(error);
+      toast.error(
+        { error },
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        }
+      );
+    }
+  };
+
   return (
     <div className="bg-back-blue ">
-      {/* <NavBar/> */}
-
-      <div className="max-w-[1240px] mx-auto ">
-        <HeaderBox header="Requested Orders" />
-        <CheckFormBox
-          placehoder="Order ID"
-          buttonName="Check"
-          linkTo="/PharmacistHome"
-        />
-
-        {/* Order Table */}
-        <div className="bg-box-blue/30 p-4 my-8 ">
-          <div className="w-full mx-auto pt-24 pb-16 px-8 bg-white font-bold rounded-xl ">
-            {/* Bill items */}
-            <div className="pb-16   ">
-              <table className="table-auto w-full border-collapse border border-slate-500 ">
-                <thead>
-                  <th className=" border border-slate-600 bg-slate-400 ">
-                    Order ID
-                  </th>
-
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Customer Name
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">
-                    E mail
-                  </th>
-
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Mobile Number
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Prescription
-                  </th>
-                </thead>
-                <tbody>
-                  {APPOINTMENT_LIST.map(
-                    ({ id, cName, Email, mobile, prescription }) => (
-                      <tr>
-                        <td className="text-center border border-slate-700">
-                          {id}
-                        </td>
-
-                        <td className="text-center border border-slate-700">
-                          {cName}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {Email}
-                        </td>
-
-                        <td className="text-center border border-slate-700">
-                          {mobile}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {prescription}
-                        </td>
-                      </tr>
-                    ),
-                  )}
-                </tbody>
-              </table>
+      {/* NavBar  */}
+      <div className="w-full  bg-back-blue  text-white fixed z-10 top-0 ">
+        {/* Current NavBar */}
+        <div className="max-w-[1200px] h-[100px] mx-auto px-4 flex items-center justify-between ">
+          <div>
+            <Logo />
+          </div>
+          <div className="w-[50%] text-[18px] ">
+            <div className="uppercase">
+              <ul className="flex gap-4 ">
+                <Link to="/PharmacistHome">
+                  <li className="Active">Requested Orders</li>
+                </Link>
+                <Link to="/DoctorAvailability">
+                  <li>Placed Orders</li>
+                </Link>
+              </ul>
             </div>
           </div>
-        </div>
-
-        {/* Adding Lab Reports */}
-        <div className="bg-box-blue/20 pb-12 ">
-          <div className="py-8 px-4 pb-12 ">
-            <div className="flex w-full gap-2 ">
-              <input type="number" placeholder="Order ID" className="w-[50%]" />
-              <input
-                type="text"
-                name=""
-                id=""
-                placeholder="Medicine"
-                className="w-[120%]"
-              />
-              <input
-                type="number"
-                name=""
-                id=""
-                placeholder="Price"
-                className="w-[60%]"
-              />
-            </div>
-          </div>
-          <Button extraTailwind="mb-8" value="Add" />
-        </div>
-
-        {/* Bill */}
-        <div className="w-full h-auto py-20 my-12 bg-box-blue/20 ">
-          {/* Bill inner box */}
-          <div className="w-[340px] mx-auto pt-24 pb-16 px-8 bg-white font-bold rounded-xl ">
-            {/* Bill items */}
-            <div className="pb-16 border-b border-slate-500  ">
-              <div className="flex justify-between ">
-                <p className="text-black">Medicine</p>
-                <p className="text-black">600.00</p>
-              </div>
-              <div className="flex justify-between ">
-                <p className="text-black">Medidine</p>
-                <p className="text-black">1700.00</p>
-              </div>
-            </div>
-            {/* Bill total */}
-            <div className="flex justify-between pt-4 pb-12 font-semi-bold text-xl ">
-              <p className="text-black">Total</p>
-              <p className="text-lime-500">2300.00</p>
-            </div>
-            <div className="flex justify-between gap-2 px-4 ">
-              <Link to="/">
-                <Button extraTailwind="min-w-[80px]" value="Confirm" />
-              </Link>
-              <Link to="/">
-                <Button extraTailwind="min-w-[80px]" value="Cancel" />
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Placed Orders */}
-        <HeaderBox header="Placed Orders" />
-        <CheckFormBox
-          placehoder="Order ID"
-          buttonName="Check"
-          linkTo="/PharmacistHome"
-        />
-        {/* Order Table */}
-        <div className="bg-box-blue/30 p-4 my-8 ">
-          <div className="w-full mx-auto pt-24 pb-16 px-8 bg-white font-bold rounded-xl ">
-            {/* Bill items */}
-            <div className="pb-16   ">
-              <table className="table-auto w-full border-collapse border border-slate-500 ">
-                <thead>
-                  <th className=" border border-slate-600 bg-slate-400 ">
-                    Order ID
-                  </th>
-
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Customer Name
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">
-                    E mail
-                  </th>
-
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Mobile Number
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Payment Status
-                  </th>
-                </thead>
-                <tbody>
-                  {APPOINTMENT_LIST.map(
-                    ({ id, cName, Email, mobile, paymentStatus }) => (
-                      <tr>
-                        <td className="text-center border border-slate-700">
-                          {id}
-                        </td>
-
-                        <td className="text-center border border-slate-700">
-                          {cName}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {Email}
-                        </td>
-
-                        <td className="text-center border border-slate-700">
-                          {mobile}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {paymentStatus}
-                        </td>
-                      </tr>
-                    ),
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <div className="w-full h-auto py-20 my-12 bg-box-blue/20 ">
-          {/* Bill inner box */}
-          <div className="w-[340px] mx-auto pt-24 pb-16 px-8 bg-white font-bold rounded-xl ">
-            {/* Bill items */}
-            <div className="pb-16 border-b border-slate-500  ">
-              <div className="flex justify-between ">
-                <p className="text-black">Medicine</p>
-                <p className="text-black">600.00</p>
-              </div>
-              <div className="flex justify-between ">
-                <p className="text-black">Medidine</p>
-                <p className="text-black">1700.00</p>
-              </div>
-            </div>
-            {/* Bill total */}
-            <div className="flex justify-between pt-4 pb-12 font-semi-bold text-xl ">
-              <p className="text-black">Total</p>
-              <p className="text-lime-500">2300.00</p>
-            </div>
-            <Link to="/">
-              <Button value="Confirm" />
-            </Link>
+          <div>
+            <Button value="Account" />
           </div>
         </div>
       </div>
+
+      <div className="max-w-[1000px] mx-auto pt-14 ">
+        <HeaderBox header="Requested Orders" />
+        <div>
+          <p className={` p-4 pt-0 `}>
+            This is the list of the requested orders by the customers. You can
+            click on one of this order and accept the request.
+          </p>
+        </div>
+
+        {/* requested order table */}
+        <div className="w-full mx-auto p-4 px-8 my-2 bg-white font-bold rounded-sm ">
+          <TableContainer component={Paper}>
+            <Table aria-label="collapsible table">
+              <TableBody>
+                <TableRow
+                  sx={{
+                    "& > *": {
+                      borderBottom: "unset",
+                      font: "bold",
+                    },
+                  }}
+                >
+                  <TableCell
+                    className="font-bold"
+                    align="center"
+                    component="th"
+                    scope="row"
+                  >
+                    Order ID
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    Customer Name
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    E-Mail
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    Prescription
+                  </TableCell>
+                </TableRow>
+                {requestedOrders.map((data) => (
+                  <TableRow
+                    onClick={() => rowClick(data.orderMedicineId)}
+                    sx={{
+                      "& > *": { borderBottom: "unset", cursor: "pointer" },
+                    }}
+                  >
+                    <TableCell align="center" component="th" scope="row">
+                      {data.orderMedicineId}
+                    </TableCell>
+                    <TableCell align="center">{data.name}</TableCell>
+                    <TableCell align="center">{data.email}</TableCell>
+                    <TableCell align="center">
+                      <Button variant="outlined" size="small">
+                        Download
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+
+        {/* Adding Medicine to the bill */}
+        <div className="bg-box-blue/20 mt-8 mb-2 ">
+          <Grid container>
+            <Grid
+              className="flex items-center justify-center py-4 pt-12"
+              item
+              lg={12}
+              md={6}
+              sm={12}
+              xs={12}
+            >
+              <p className="px-4">Order ID :</p>
+              <p className="px-4">{currentOrderId}</p>
+            </Grid>
+          </Grid>
+          <div className="bg-white ">
+            <div className="p-1">
+              <ValidatorForm
+                className="md:flex w-[95%] m-auto py-4 "
+                onSubmit={() => addMedicineData()}
+              >
+                <Grid container spacing={1}>
+                  <Grid item lg={5} md={6} sm={12} xs={12}>
+                    <TextValidator
+                      className="w-full md:mb-0  "
+                      label="Medicine"
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      value={medicine.medicine}
+                      onChange={(e) =>
+                        setMedicine({ ...medicine, medicine: e.target.value })
+                      }
+                    />
+                  </Grid>
+                  <Grid item lg={5} md={6} sm={12} xs={12}>
+                    <TextValidator
+                      type="number"
+                      className="w-full md:mb-0  "
+                      label="Amount"
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      value={medicine.price}
+                      onChange={(e) =>
+                        setMedicine({ ...medicine, price: e.target.value })
+                      }
+                    />
+                  </Grid>
+                  <Grid
+                    className="flex justify-center"
+                    item
+                    lg={2}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <Button type="submit" variant="contained" size="small">
+                      Add
+                    </Button>
+                  </Grid>
+                </Grid>
+              </ValidatorForm>
+            </div>
+          </div>
+        </div>
+
+        {/* Bill */}
+        {reqbillHandler ? (
+          <div className="w-full h-auto py-4 my-12 mt-2 bg-box-blue/20 ">
+            {/* Bill inner box */}
+            <div className="w-[340px] mx-auto pt-8 px-8 bg-white font-bold rounded-xl ">
+              {/* Bill items */}
+              <div className="pb-8 border-b border-slate-500  ">
+                {billData !== null
+                  ? billData.map((data, index) => {
+                      return (
+                        <div key={index} className="flex justify-between ">
+                          <p className="text-black">{data.medicine}</p>
+                          <p className="text-black">{data.price}</p>
+                        </div>
+                      );
+                    })
+                  : null}
+                <div className="flex justify-between ">
+                  <p className="text-black">Delivery Charges</p>
+                  <p className="text-black">500</p>
+                </div>
+              </div>
+              {/* Bill total */}
+              <div className="flex justify-between pt-4 pb-12 font-semi-bold text-xl ">
+                <p className="text-black">Total</p>
+                <p className="text-lime-500">{total}</p>
+              </div>
+              <div className="flex justify-center gap-2 px-4 pb-8 pt-4 ">
+                <Button variant="contained" onClick={submitMedicines}>
+                  Submit
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+
+        {/* Placed Orders */}
+        <HeaderBox header="Placed Orders" />
+
+        {/* Placed Order Table */}
+        <div className="w-full mx-auto p-4 px-8 my-2 bg-white font-bold rounded-sm ">
+          <TableContainer component={Paper}>
+            <Table aria-label="collapsible table">
+              <TableBody>
+                <TableRow
+                  sx={{
+                    "& > *": {
+                      borderBottom: "unset",
+                      font: "bold",
+                    },
+                  }}
+                >
+                  <TableCell
+                    className="font-bold"
+                    align="center"
+                    component="th"
+                    scope="row"
+                  >
+                    Order ID
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    Customer Name
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    E-Mail
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    Total Bill
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    Payment Status
+                  </TableCell>
+                </TableRow>
+                {confirmedOrders.map((data) => (
+                  <TableRow
+                    onClick={() => placedRowClick(data.orderMedicineId)}
+                    sx={{
+                      "& > *": { borderBottom: "unset", cursor: "pointer" },
+                    }}
+                  >
+                    <TableCell align="center" component="th" scope="row">
+                      {data.orderMedicineId}
+                    </TableCell>
+                    <TableCell align="center">{data.name}</TableCell>
+                    <TableCell align="center">{data.email}</TableCell>
+                    <TableCell align="center">{data.total}</TableCell>
+                    <TableCell align="center">Done</TableCell>
+                    {/* <TableCell align="center">
+                      <Button variant="outlined" size="small">
+                        Place Order
+                      </Button>
+                    </TableCell> */}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </div>
+
+        {/* Placed Bill */}
+        {plabillHandler ? (
+          <div className="w-full h-auto py-4 my-12 mt-2 bg-box-blue/20 ">
+            {/* Bill inner box */}
+            <div className="w-[340px] mx-auto pt-8 px-8 bg-white font-bold rounded-xl ">
+              {/* Bill items */}
+              <div className="pb-8 border-b border-slate-500  ">
+                {placedBillData.map((data, index) => {
+                  return (
+                    <div key={index} className="flex justify-between ">
+                      <p className="text-black">{data.medicine}</p>
+                      <p className="text-black">{data.price}</p>
+                    </div>
+                  );
+                })}
+              </div>
+              {/* Bill total */}
+              {/* <div className="flex justify-between pt-4 pb-12 font-semi-bold text-xl ">
+                <p className="text-black">Total</p>
+                <p className="text-lime-500">{placedTotal}</p>
+              </div> */}
+              <div className="flex justify-center gap-2 px-4 pb-8 pt-4 ">
+                <Button variant="contained" onClick={placingOrder}>
+                  Confirm Order
+                </Button>
+              </div>
+            </div>
+          </div>
+        ) : null}
+      </div>
+      <ToastContainer />
       <Footer />
     </div>
   );

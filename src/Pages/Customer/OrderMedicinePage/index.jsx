@@ -34,19 +34,42 @@ function OrderMedicine() {
   const placedStatus = false;
   const navigate = useNavigate();
 
+  //  check the status about the order
   const HandleOrderSubmit = async (id) => {
     let res = await axios
-      .get(`http://localhost:8080/order/getOrderId/${id}`)
+      .get(`http://localhost:8080/order/getOrderId?orderId=${id}`)
       .then(function (response) {
         console.log("Searched Data", response);
         // // setData(response);
         if (response.data != "") {
-          // console.log("Search Details", response.data);
-          if (response.data.requestStatus === false) {
+          console.log("NullData");
+          //  when customer requested but pharmacist not add medicines
+          if (
+            response.data.requestStatus === false &&
+            response.data.placedStatus === false &&
+            response.data.confirmedStatus === false
+          ) {
             console.log("Order Processing");
             navigate("/OrderProcessing");
-          } else console.log("Order Successful");
-          navigate("/CompletedOrder");
+          }
+          //  when pharmacist added the medicines
+          if (
+            response.data.requestStatus === true &&
+            response.data.placedStatus === false &&
+            response.data.confirmedStatus === false
+          ) {
+            console.log("Order Successful");
+            navigate("/CompletedOrder", { state: { order: response.data } });
+          }
+          // when order confirmed and all done
+          if (
+            response.data.requestStatus === true &&
+            response.data.placedStatus === true &&
+            response.data.confirmedStatus === true
+          ) {
+            console.log("Order Successful");
+            navigate("/OrderSuccessful");
+          }
         } else console.log("No Data");
       })
       .catch(function (error) {
@@ -54,8 +77,8 @@ function OrderMedicine() {
       });
   };
 
+  // requesting the order --- POST method
   const onSubmit = async () => {
-    // window.alert(mNumber);
     setSnackBar(true);
     let res = await axios
       .post("http://localhost:8080/order/createOrder", {
@@ -72,28 +95,25 @@ function OrderMedicine() {
       .then(function (response) {
         console.log(response);
         setData(response);
-        toast.success("Successfuly Requested", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        navigate(
+          `/orderMedicine/SuccessfulOrderRequest?orderMedicineId=${response.data.orderMedicineId}`
+        );
       })
       .catch(function (error) {
-        toast.error("Error", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
+        console.log(error);
+        toast.error(
+          { error },
+          {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          }
+        );
       });
   };
 
@@ -103,7 +123,7 @@ function OrderMedicine() {
 
       {/* Order Medicine Page */}
 
-      <div className="max-w-[1240px] mx-auto pt-28 ">
+      <div className="max-w-[1000px] mx-auto pt-28 ">
         {/* Check Form */}
 
         <HeaderBox
@@ -173,14 +193,7 @@ function OrderMedicine() {
         <div>
           <div className="p-4 px-12">
             <p>Delivery Chargers Will be apply*</p>
-            <p className="px-12">
-              {appConst.deliveryChargers[0].name} -
-              {appConst.deliveryChargers[0].charge}
-            </p>
-            <p className="px-12">
-              {appConst.deliveryChargers[1].name} -
-              {appConst.deliveryChargers[1].charge}
-            </p>
+            <p className="px-12">500 LKR</p>
           </div>
           <div className="bg-white">
             <div className="p-4">

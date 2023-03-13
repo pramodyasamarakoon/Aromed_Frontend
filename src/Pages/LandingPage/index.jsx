@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import NavBar from "../../Lib/NavBar";
 import Hero from "../../Lib/Hero";
@@ -48,11 +48,9 @@ function Row(props) {
         onClick={() => setOpen(!open)}
         sx={{ "& > *": { borderBottom: "unset", cursor: "pointer" } }}
       >
-        <TableCell align="right" component="th" scope="row">
-          {row.res}
-        </TableCell>
         <TableCell align="left">{row.name}</TableCell>
-        <TableCell align="left">{row.special}</TableCell>
+        <TableCell align="left">{row.gender}</TableCell>
+        <TableCell align="left">{row.specialisation}</TableCell>
       </TableRow>
       <TableRow>
         <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
@@ -69,24 +67,9 @@ function Row(props) {
                 >
                   <div>
                     <p className="text-back-blue font-semibold">
-                      Other Specialization...
-                    </p>
-                    <p className="text-black">{row.otherSpecialization}</p>
-                  </div>
-                </Grid>
-                <Grid
-                  // className="flex justify-center"
-                  item
-                  lg={6}
-                  md={12}
-                  sm={12}
-                  xs={12}
-                >
-                  <div>
-                    <p className="text-back-blue font-semibold">
                       Qualifications...
                     </p>
-                    <p className="text-black">{row.qualifications}</p>
+                    <p className="text-black">{row.qualification}</p>
                   </div>
                 </Grid>
                 <Grid
@@ -116,7 +99,7 @@ function Row(props) {
                     <p className="text-back-blue font-semibold">
                       Special Note...
                     </p>
-                    <p className="text-black">{row.specialNote}</p>
+                    <p className="text-black">{row.note}</p>
                   </div>
                 </Grid>
               </Grid>
@@ -129,7 +112,8 @@ function Row(props) {
 }
 
 function LandingPage() {
-  const [doctor, setDoctor] = useState(DoctorData);
+  const [doctor, setDoctor] = useState([]);
+  // const [filterDoctor, setFilterDoctor] = useState(doctor);
   const [id, setId] = useState();
   const [userName, setUserName] = useState();
   const [password, setPassword] = useState();
@@ -137,6 +121,10 @@ function LandingPage() {
   const [searchSpecial, setSearchSpecial] = useState("");
   const navigate = useNavigate();
   const today = new Date().toISOString().slice(0, 10);
+
+  useEffect(() => {
+    loadDoctorData();
+  }, []);
 
   // Check Appointment ID
   const checkAppointment = async (ID, e) => {
@@ -172,6 +160,17 @@ function LandingPage() {
         // console.log("not today");
         navigate(`/NotTodayAppointment?date=${result.date}`);
       }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // load doctor data
+  const loadDoctorData = async () => {
+    try {
+      const response = await axios.get("http://localhost:8080/user/allDoctors");
+      setDoctor(response.data);
+      console.log("Result", response.data);
     } catch (error) {
       console.log(error);
     }
@@ -225,7 +224,7 @@ function LandingPage() {
   };
 
   const search = (event) => {
-    const matchedUsers = DoctorData.filter((user) => {
+    const matchedUsers = doctor.filter((user) => {
       return `${user.name}`
         .toLowerCase()
         .includes(event.target.value.toLowerCase());
@@ -236,8 +235,8 @@ function LandingPage() {
   };
 
   const searchSpecialization = (event) => {
-    const matchedUsers = DoctorData.filter((user) => {
-      return `${user.special}`
+    const matchedUsers = doctor.filter((user) => {
+      return `${user.specialisation}`
         .toLowerCase()
         .includes(event.target.value.toLowerCase());
     });
@@ -251,6 +250,11 @@ function LandingPage() {
       <TableContainer component={Paper}>
         <Table aria-label="collapsible table">
           <TableBody>
+            <TableRow>
+              <TableCell align="left">Doctor Name</TableCell>
+              <TableCell align="left">Gender</TableCell>
+              <TableCell align="left">Specialization</TableCell>
+            </TableRow>
             {doctor.map((user) => (
               <Row row={user} />
             ))}
@@ -460,7 +464,9 @@ function LandingPage() {
                       variant="outlined"
                       size="small"
                       value={searchPhrase}
-                      onChange={search}
+                      onChange={(e) => {
+                        search(e);
+                      }}
                     />
                   </Grid>
                   <Grid
