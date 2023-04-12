@@ -23,81 +23,225 @@ import HeaderBox from "../../../../components/HeaderBox";
 import Logo from "../../../../components/Logo";
 import Footer from "../../../../Lib/Footer";
 
-// Data for Charges
-const CHARGE_DETAILS = [
-  {
-    ID: 123456,
-    Name: "Doctor 01 - Appointment Fee",
-    Category: "Appointment Fee",
-    Fee: 1600,
-  },
-  {
-    ID: 123456,
-    Name: "Doctor 01 - Appointment Fee",
-    Category: "Appointment Fee",
-    Fee: 1600,
-  },
-  {
-    ID: 123456,
-    Name: "Doctor 01 - Appointment Fee",
-    Category: "Appointment Fee",
-    Fee: 1600,
-  },
-  {
-    ID: 123456,
-    Name: "Doctor 01 - Appointment Fee",
-    Category: "Appointment Fee",
-    Fee: 1600,
-  },
-  {
-    ID: 123456,
-    Name: "Doctor 01 - Appointment Fee",
-    Category: "Appointment Fee",
-    Fee: 1600,
-  },
-];
+function AdminCharges() {
+  const [searchPhrase, setSearchPhrase] = useState("");
+  const [typeSearchPhrase, setTypeSearchPhrase] = useState("");
+  const [users, setUsers] = useState([]);
+  const [chargeType, setChargeType] = useState("Laboratory Charges");
+  const [name, setName] = useState();
+  const [fee, setFee] = useState(0);
+  const [charges, setCharges] = useState([]);
+  const [buttonHandle, setButtonHandle] = useState(true);
+  const [clickedChargeId, setClickedChargeId] = useState();
 
-// Data for Laboratory Charges
-const LABORATORY_CHARGE_DETAILS = [
-  {
-    LID: 123456,
-    LName: "Blood Test",
-    LFee: 950,
-  },
-  {
-    LID: 123456,
-    LName: "Blood Test",
-    LFee: 950,
-  },
-  {
-    LID: 123456,
-    LName: "Blood Test",
-    LFee: 950,
-  },
-  {
-    LID: 123456,
-    LName: "Blood Test",
-    LFee: 950,
-  },
-  {
-    LID: 123456,
-    LName: "Blood Test",
-    LFee: 950,
-  },
-];
+  useEffect(() => {
+    loadCharges();
+  }, []);
 
-function Row(props) {
-  const { row } = props;
-  const [open, setOpen] = React.useState(false);
+  const rowClick = async (chargeId) => {
+    setClickedChargeId(chargeId);
+    try {
+      axios
+        .get(`http://localhost:8080/charges/getChargeById?chargeId=${chargeId}`)
+        .then((res) => {
+          let response = res.data;
+          console.log("Charge", response);
+          setChargeType(response.chargeType);
+          setName(response.name);
+          setFee(response.fee);
+          setButtonHandle(false);
+        })
+        .catch((err) => {
+          console.error(err);
+          // Do something on error, e.g. show an error message
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const deleteUser = (userId) => {
-    console.log(userId);
+  const Row = (props) => {
+    const { row } = props;
+    const [open, setOpen] = React.useState(false);
+
+    return (
+      <React.Fragment>
+        <TableRow
+          onClick={() => rowClick(row.chargeId)}
+          sx={{ "& > *": { borderBottom: "unset", cursor: "pointer" } }}
+        >
+          <TableCell align="left" component="th" scope="row">
+            {row.chargeId}
+          </TableCell>
+          <TableCell align="left" sx={{ paddingLeft: "20px" }}>
+            {row.chargeType}
+          </TableCell>
+          <TableCell align="left">{row.name}</TableCell>
+          <TableCell align="left">{row.fee}</TableCell>
+          {/* <TableCell align="right">
+            <Button
+              variant="outlined"
+              sx={{
+                padding: "2px 4px",
+                fontSize: "0.8rem",
+              }}
+              onClick={() => deleteUser(row.userId)}
+              // type="submit"
+            >
+              Remove
+            </Button>
+          </TableCell> */}
+        </TableRow>
+      </React.Fragment>
+    );
+  };
+
+  //  add charge
+  const addCharge = async () => {
+    try {
+      axios
+        .post(
+          `http://localhost:8080/charges/addCharge?chargeType=${chargeType}&name=${name}&fee=${fee}`
+        )
+        .then((res) => {
+          console.log("Charge", res.data);
+          loadCharges();
+          toast.success("Successfully Added the Charge", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+          clearFields();
+        })
+        .catch((err) => {
+          console.error(err);
+          // Do something on error, e.g. show an error message
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // load all charges
+  const loadCharges = async () => {
+    try {
+      axios
+        .get("http://localhost:8080/charges/getAll")
+        .then((res) => {
+          console.log("All Charges", res.data);
+          setCharges(res.data);
+        })
+        .catch((err) => {
+          console.error(err);
+          // Do something on error, e.g. show an error message
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  //  search by name
+  const searchByName = (event) => {
+    const matchedUsers = charges.filter((charge) => {
+      return `${charge.name}`
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase());
+    });
+    setCharges(matchedUsers);
+    setSearchPhrase(event.target.value);
+  };
+
+  //  search by type
+  const searchByType = (event) => {
+    const matchedUsers = charges.filter((charge) => {
+      return `${charge.chargeType}`
+        .toLowerCase()
+        .includes(event.target.value.toLowerCase());
+    });
+    setCharges(matchedUsers);
+    setTypeSearchPhrase(event.target.value);
+  };
+
+  const renderCharges = () => {
+    return (
+      <TableContainer component={Paper}>
+        <Table aria-label="collapsible table">
+          <TableBody>
+            <TableRow
+              sx={{ "& > *": { borderBottom: "unset", cursor: "pointer" } }}
+            >
+              <TableCell align="left" component="th" scope="row">
+                Charge Id
+              </TableCell>
+              <TableCell align="left" sx={{ paddingLeft: "20px" }}>
+                Charge Type
+              </TableCell>
+              <TableCell align="left">Name</TableCell>
+              <TableCell align="left">Fee</TableCell>
+            </TableRow>
+            {charges.map((user) => (
+              <Row row={user} />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+    );
+  };
+
+  // Update charges
+  const updateCharges = async () => {
+    try {
+      axios
+        .put(
+          `http://localhost:8080/charges/updateChargeById?chargeId=${clickedChargeId}&chargeType=${chargeType}&name=${name}&fee=${fee}`
+        )
+        .then((res) => {
+          console.log("Updated Charge", res.data);
+          loadCharges();
+          toast.success("Successfully Updated the Charge", {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "dark",
+          });
+          clearFields();
+        })
+        .catch((err) => {
+          console.error(err);
+          // Do something on error, e.g. show an error message
+        });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Clear fields
+  const clearFields = () => {
+    setChargeType("Laboratory Charges");
+    setName("");
+    setFee(0);
+    setButtonHandle(true);
+    setClickedChargeId();
+  };
+
+  // delete charges
+  const deleteChargeById = () => {
     axios
-      .delete(`http://localhost:8080/user/${userId}`)
+      .delete(
+        `http://localhost:8080/charges/deleteChargeByChargeId?chargeId=${clickedChargeId}`
+      )
       .then((response) => {
         console.log(response.data); // Successfully user removed
-        // perform any additional actions you need after the user is deleted
-        toast.success("Successfully User Removed", {
+        toast.success("Successfully Charge Removed", {
           position: "top-right",
           autoClose: 5000,
           hideProgressBar: false,
@@ -107,6 +251,8 @@ function Row(props) {
           progress: undefined,
           theme: "dark",
         });
+        loadCharges();
+        clearFields();
       })
       .catch((error) => {
         console.log(error.response.data); // Error
@@ -121,168 +267,6 @@ function Row(props) {
           theme: "dark",
         });
       });
-    window.location.reload();
-  };
-
-  return (
-    <React.Fragment>
-      <TableRow
-        // onClick={() => setOpen(!open)}
-        sx={{ "& > *": { borderBottom: "unset", cursor: "pointer" } }}
-      >
-        <TableCell align="center" component="th" scope="row">
-          {row.userId}
-        </TableCell>
-        <TableCell align="left" sx={{ paddingLeft: "20px" }}>
-          {row.name}
-        </TableCell>
-        <TableCell align="center">{row.userType}</TableCell>
-        <TableCell align="right">
-          <Button
-            variant="outlined"
-            sx={{
-              padding: "2px 4px",
-              fontSize: "0.8rem",
-            }}
-            onClick={() => deleteUser(row.userId)}
-            // type="submit"
-          >
-            Remove
-          </Button>
-        </TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-          <Collapse in={open} timeout="auto" unmountOnExit>
-            <Box sx={{ marginX: 6, marginY: 1 }}>
-              <Grid container spacing={1}>
-                <Grid
-                  // className="flex justify-center"
-                  item
-                  lg={6}
-                  md={12}
-                  sm={12}
-                  xs={12}
-                >
-                  <div className="flex justify-around">
-                    <p className="text-back-blue font-semibold">NIC</p>
-                    <p className="text-black">{row.nic}</p>
-                  </div>
-                </Grid>
-                <Grid
-                  // className="flex justify-center"
-                  item
-                  lg={6}
-                  md={12}
-                  sm={12}
-                  xs={12}
-                >
-                  <div className="flex justify-around">
-                    <p className="text-back-blue font-semibold">Address</p>
-                    <p className="text-black">{row.address}</p>
-                  </div>
-                </Grid>
-              </Grid>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </React.Fragment>
-  );
-}
-
-function AdminCharges() {
-  const [searchPhrase, setSearchPhrase] = useState("");
-  const [users, setUsers] = useState([]);
-  const [chargeType, setChargeType] = useState();
-  const [name, setName] = useState();
-  const [fee, setFee] = useState();
-
-  useEffect(() => {
-    fetch("http://localhost:8080/user/allUsers")
-      .then((response) => response.json())
-      .then((data) => setUsers(data))
-      .catch((error) => console.log(error));
-  }, []);
-
-  const addUser = async () => {
-    const charge = {
-      chargeType: chargeType,
-      name: name,
-      fee: fee,
-    };
-    try {
-      const response = await axios.post(
-        "http://localhost:8080/user/addUser",
-        charge
-      );
-      console.log("Add user Res", response);
-      if (response.status === 200) {
-        toast.success("User created successfully!", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error(error.response.data);
-      if (error.response.data == "UserName already exists") {
-        toast.error("UserName already exists", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-      }
-      if (error.response.data == "Password doesn't match") {
-        toast.error("Password doesn't match", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "dark",
-        });
-      }
-    }
-
-    // window.alert(password);
-  };
-
-  const search = (event) => {
-    const matchedUsers = users.filter((user) => {
-      return `${user.name}`
-        .toLowerCase()
-        .includes(event.target.value.toLowerCase());
-    });
-    setUsers(matchedUsers);
-    setSearchPhrase(event.target.value);
-  };
-
-  const renderUsers = () => {
-    return (
-      <TableContainer component={Paper}>
-        <Table aria-label="collapsible table">
-          <TableBody>
-            {users.map((user) => (
-              <Row row={user} />
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
   };
 
   return (
@@ -329,26 +313,12 @@ function AdminCharges() {
         {/* Filtering the date */}
         <div className="bg-white">
           <div className="p-2">
-            <ValidatorForm
-              className="md:flex w-[90%] m-auto py-4 "
-              // onSubmit={signIn}
-              // onError={() => null}
-            >
+            <ValidatorForm className="md:flex w-[90%] m-auto py-2 ">
               <Grid container spacing={1}>
-                <Grid
-                  className="flex items-center"
-                  item
-                  lg={4}
-                  md={4}
-                  sm={12}
-                  xs={12}
-                >
-                  <p className="text-black">Search Charge By Name</p>
-                </Grid>
                 <Grid
                   // className="flex items-center"
                   item
-                  lg={8}
+                  lg={6}
                   md={8}
                   sm={12}
                   xs={12}
@@ -356,12 +326,31 @@ function AdminCharges() {
                   <TextValidator
                     // sx={{ width: "90%" }}
                     className="w-full md:mb-0  "
-                    label="Search Charge"
+                    label="Search Charges By Name"
                     fullWidth
                     variant="outlined"
                     size="small"
                     value={searchPhrase}
-                    onChange={search}
+                    onChange={searchByName}
+                  />
+                </Grid>
+                <Grid
+                  // className="flex items-center"
+                  item
+                  lg={6}
+                  md={8}
+                  sm={12}
+                  xs={12}
+                >
+                  <TextValidator
+                    // sx={{ width: "90%" }}
+                    className="w-full md:mb-0  "
+                    label="Search Charges By Charge Type"
+                    fullWidth
+                    variant="outlined"
+                    size="small"
+                    value={typeSearchPhrase}
+                    onChange={searchByType}
                   />
                 </Grid>
               </Grid>
@@ -370,7 +359,7 @@ function AdminCharges() {
         </div>
 
         <div className="bg-white">
-          <div className="my-2">{renderUsers()}</div>
+          <div className="my-2">{renderCharges()}</div>
         </div>
 
         {/* User Details */}
@@ -379,7 +368,7 @@ function AdminCharges() {
           <div className="p-4">
             <ValidatorForm
               className="md:flex w-full m-auto py-4 "
-              onSubmit={addUser}
+              onSubmit={addCharge}
               onError={() => null}
             >
               <Grid container spacing={1}>
@@ -398,14 +387,10 @@ function AdminCharges() {
                       // label="Gender"
                       size="small"
                       required={true}
-                      defaultValue={"Male"}
                       onChange={(e) => {
                         setChargeType(e.target.value);
                       }}
                     >
-                      <MenuItem value={"Doctor Charges"}>
-                        Doctor Charges
-                      </MenuItem>
                       <MenuItem value={"Laboratory Charges"}>
                         Laboratory Charges
                       </MenuItem>
@@ -468,21 +453,80 @@ function AdminCharges() {
 
                 {/* Submit */}
                 <Grid
-                  className="flex justify-center"
+                  className="flex justify-end"
                   item
-                  lg={12}
+                  lg={6}
+                  md={12}
+                  sm={12}
+                  xs={12}
+                ></Grid>
+                {buttonHandle ? (
+                  <Grid
+                    className="flex justify-end"
+                    item
+                    lg={6}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <Button
+                      variant="contained"
+                      // onClick={addUser}
+                      type="submit"
+                    >
+                      Add Charge
+                    </Button>
+                  </Grid>
+                ) : (
+                  <Grid
+                    className="flex justify-end"
+                    item
+                    lg={6}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <Button
+                      variant="contained"
+                      onClick={updateCharges}
+                      // type="submit"
+                    >
+                      Update
+                    </Button>
+                  </Grid>
+                )}
+
+                <Grid
+                  className="flex justify-start"
+                  item
+                  lg={4}
                   md={12}
                   sm={12}
                   xs={12}
                 >
-                  <Button
-                    variant="contained"
-                    // onClick={addUser}
-                    type="submit"
-                  >
-                    Add Charge
+                  <Button variant="contained" onClick={clearFields}>
+                    Clear
                   </Button>
                 </Grid>
+
+                {buttonHandle ? null : (
+                  <Grid
+                    className="flex justify-end"
+                    item
+                    lg={2}
+                    md={12}
+                    sm={12}
+                    xs={12}
+                  >
+                    <Button
+                      variant="contained"
+                      onClick={deleteChargeById}
+                      // type="submit"
+                    >
+                      Delete
+                    </Button>
+                  </Grid>
+                )}
               </Grid>
             </ValidatorForm>
           </div>

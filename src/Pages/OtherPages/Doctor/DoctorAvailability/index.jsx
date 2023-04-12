@@ -54,6 +54,7 @@ function DoctorAvailability() {
           {
             params: {
               doctorId: doctor,
+              startDate: "2023-04-19",
             },
           }
         );

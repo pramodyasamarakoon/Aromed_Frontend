@@ -13,7 +13,8 @@ import { ValidatorForm } from "react-material-ui-form-validator";
 import { Link } from "react-router-dom";
 import HeaderBox from "../../../../components/HeaderBox";
 import Logo from "../../../../components/Logo";
-import Button from "../../../../components/MainButton";
+import MainButton from "../../../../components/MainButton";
+import Button from "@mui/material/Button";
 import Footer from "../../../../Lib/Footer";
 
 /* Data for Appointments */
@@ -70,6 +71,30 @@ function DoctorHome() {
     console.log("Appointments", appointments);
   };
 
+  const createZoomMeetingLink = async () => {
+    try {
+      const response = await axios.post(
+        "https://api.zoom.us/v2/users/me/meetings",
+        {
+          topic: "My Meeting",
+          type: 2,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${"eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOm51bGwsImlzcyI6IlNGdXhjZDk3UVZ5SjlhcHU4a2N3bGciLCJleHAiOjE2ODIzNjEwNjAsImlhdCI6MTY4MTIxODM1MX0.XhHiu3TcJD8Kna9AM_I9l36Qxwt0Q_i6NZRYBFYt3oo"}`,
+          },
+        }
+      );
+      const meetingLink = response.data.join_url;
+      console.log(meetingLink);
+      // Do something with the meeting link, like display it to the user.
+    } catch (error) {
+      console.error(error);
+      // Handle the error
+    }
+  };
+
   return (
     <div className="bg-back-blue ">
       {/* <NavBar/> */}
@@ -92,7 +117,7 @@ function DoctorHome() {
             </div>
           </div>
           <div>
-            <Button value="Account" />
+            <MainButton value="Account" />
           </div>
         </div>
       </div>
@@ -202,6 +227,14 @@ function DoctorHome() {
                       <TableCell align="center">
                         {" "}
                         {videoConference ? "Virtual" : "Physical"}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          onClick={() => createZoomMeetingLink()}
+                          variant="contained"
+                        >
+                          Start
+                        </Button>
                       </TableCell>
                     </TableRow>
                   )
