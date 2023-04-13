@@ -151,10 +151,10 @@ function LandingPage() {
       //   navigate(`/NotTodayAppointment?date=${result.date}`);
       // }
       else if (result.date === today) {
-        console.log("today");
+        console.log("today", result);
 
         navigate(
-          `/WaitingForAppointment?appointmentNumber=${result.appointmentNumber}&appointmentId=${result.appointmentId}`
+          `/WaitingForAppointment?appointmentNumber=${result.appointmentNumber}&appointmentId=${result.appointmentId}&appointmentTime=${result.appointmentTime}`
         );
       } else {
         // console.log("not today");
