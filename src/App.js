@@ -22,6 +22,7 @@ import DoctorHome from "./Pages/OtherPages/Doctor/DoctorHome";
 import DoctorAvailability from "./Pages/OtherPages/Doctor/DoctorAvailability";
 import DoctorMeeting from "./Pages/OtherPages/Doctor/DoctorMeeting";
 import AdminHome from "./Pages/OtherPages/Admin/AdminHome";
+import Dashboard from "./Pages/OtherPages/Admin/Dashboard";
 import AdminCharges from "./Pages/OtherPages/Admin/AdminCharges";
 import AccountPage from "./Pages/OtherPages/AccountPage";
 import NotTodayAppointment from "./Pages/Customer/NotTodayAppointment";
@@ -78,6 +79,7 @@ function App() {
           <Route path="/DoctorMeeting" element={<DoctorMeeting />} />
 
           {/* Admin */}
+          <Route path="/Dashboard" element={<Dashboard />} />
           <Route path="/AdminHome" element={<AdminHome />} />
           <Route path="/AdminCharges" element={<AdminCharges />} />
           

@@ -281,6 +281,9 @@ function AdminCharges() {
           <div className="w-[50%] text-[18px] ">
             <div className="uppercase">
               <ul className="flex gap-4 ">
+                <Link to="/Dashboard">
+                  <li>Dashboard</li>
+                </Link>
                 <Link to="/AdminHome">
                   <li>User Accounts</li>
                 </Link>
