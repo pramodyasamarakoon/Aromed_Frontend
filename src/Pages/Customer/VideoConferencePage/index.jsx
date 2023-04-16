@@ -102,63 +102,76 @@ function VideoConference() {
 
   const onSubmit = async () => {
     // window.alert('Data Successfully Saved')
-    toast.success("Customer Registered Successfully!", {
-      position: "top-right",
-      autoClose: 5000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-      theme: "dark",
-    });
-    setSnackBar(true);
-    let res = await axios
-      .post("http://localhost:8080/customer/videoConference", {
-        name: name,
-        pName: pName,
-        mNumber: mNumber,
-        email: email,
-        address: address,
-        gender: gender,
-        age: age,
-        nic: nic,
-        doctor: doctor,
-        date: date,
-        message: message,
-        videoConference: videoConference,
-      })
-      .then(function (response) {
-        console.log(response);
-        setData(response);
-        if (response.status === 201) {
-          console.log("Submit Customer", response.data);
-          setTempAppointmentId(response.data.appointmentId);
-          setBillHandler(true);
-          // appConst.doctors.forEach((element, index) => {
-          //   if (doctor === appConst.doctors.find(doctor)) {
-          //     console.log("Success");
-          //   }
-          //   console.log("Error");
-          // });
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-        toast.error(
-          { error },
-          {
-            position: "top-right",
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: "dark",
-          }
-        );
+    if (date != null) {
+      toast.success("Customer Registered Successfully!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
       });
+      setSnackBar(true);
+      let res = await axios
+        .post("http://localhost:8080/customer/videoConference", {
+          name: name,
+          pName: pName,
+          mNumber: mNumber,
+          email: email,
+          address: address,
+          gender: gender,
+          age: age,
+          nic: nic,
+          doctor: doctor,
+          date: date,
+          message: message,
+          videoConference: videoConference,
+        })
+        .then(function (response) {
+          console.log(response);
+          setData(response);
+          if (response.status === 201) {
+            console.log("Submit Customer", response.data);
+            setTempAppointmentId(response.data.appointmentId);
+            setBillHandler(true);
+            // appConst.doctors.forEach((element, index) => {
+            //   if (doctor === appConst.doctors.find(doctor)) {
+            //     console.log("Success");
+            //   }
+            //   console.log("Error");
+            // });
+          }
+        })
+        .catch(function (error) {
+          console.log(error);
+          toast.error(
+            { error },
+            {
+              position: "top-right",
+              autoClose: 5000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+              progress: undefined,
+              theme: "dark",
+            }
+          );
+        });
+    } else {
+      toast.error("Please Select Date!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "dark",
+      });
+    }
   };
 
   const bookAnAppointmentWithPayment = async () => {
