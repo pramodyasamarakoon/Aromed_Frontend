@@ -43,6 +43,7 @@ function Dashboard() {
     loadRevenue();
     loadTotalRevenue();
   }, []);
+  const [userId, setUserId] = useState();
   const [revenue, setRevenue] = useState([]);
   const [lastWeek, setLastWeek] = useState([]);
   const [totalRevenue, setTotalrevenue] = useState(0);

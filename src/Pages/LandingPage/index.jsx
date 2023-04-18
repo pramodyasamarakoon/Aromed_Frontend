@@ -180,7 +180,6 @@ function LandingPage() {
     axios
       .post("http://localhost:8080/user/login", { userName, password })
       .then((response) => {
-        // window.alert("Successful");
         console.log(response.data);
         if (response.data == "Username doesn't Exist") {
           toast.error("Username doesnt Exist", {
@@ -205,21 +204,25 @@ function LandingPage() {
             theme: "dark",
           });
         } else if (response.data == "Login Successful") {
-          // toast.success("Login Successful", {
-          //   position: "top-right",
-          //   autoClose: 5000,
-          //   hideProgressBar: false,
-          //   closeOnClick: true,
-          //   pauseOnHover: true,
-          //   draggable: true,
-          //   progress: undefined,
-          //   theme: "dark",
-          // });
+          axios
+            .get(`http://localhost:8080/user/signIn?userName=${userName}`)
+            .then((response) => {
+              console.log("User", response.data);
+              const userType = response.data.userType;
+              if (userType === "Admin") {
+                navigate(`/Dashboard?userId=${response.data.userId}`);
+              } else if (userType === "Doctor") {
+                navigate(`/DoctorHome?userId=${response.data.userId}`);
+              } else if (userType === "Receptionist") {
+                navigate(`/ReceptionistHome?userId=${response.data.userId}`);
+              } else if (userType === "Pharmacist") {
+                navigate(`/PharmacistHome?userId=${response.data.userId}`);
+              }
+            });
         }
       })
       .catch((error) => {
-        // Handle login error
-        window.alert("UnSuccessful");
+        console.log(error);
       });
   };
 

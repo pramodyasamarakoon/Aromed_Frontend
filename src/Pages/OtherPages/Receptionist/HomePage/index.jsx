@@ -1,5 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 // import NavBar from "../../Lib/NavBar";
 import HeaderBox from "../../../../components/HeaderBox";
 import Logo from "../../../../components/Logo";
@@ -9,9 +9,15 @@ import Footer from "../../../../Lib/Footer";
 import { DoctorData } from "../../../../Lib/Const/DoctorData";
 import { TextValidator, ValidatorForm } from "react-material-ui-form-validator";
 import {
+  Grid,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableRow,
   Button,
   FormControl,
-  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -20,6 +26,8 @@ import { useState } from "react";
 import axios from "axios";
 import * as appConst from "../../../../Lib/Const/const";
 import { landingPageValidation } from "../../../../Validations/LandingPageV";
+import { toast, ToastContainer } from "react-toastify";
+import { getAllDoctors } from "../../../../Lib/Const/const";
 
 /* Data for Appointment List */
 const APPOINTMENT_LIST = [
@@ -108,6 +116,20 @@ function ReceptionistHome() {
   const [tempAppointmentId, setTempAppointmentId] = useState();
   const [data, setData] = useState();
   const [id, setId] = useState();
+  const today = new Date().toISOString().slice(0, 10);
+  const navigate = useNavigate();
+  const [appointments, setAppointments] = useState([]);
+  const [doctorId, setDoctorId] = useState();
+  const [allDoctors, setAllDoctors] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const result = await getAllDoctors();
+      setAllDoctors(result);
+      console.log("Doc", result);
+    };
+    fetchData();
+  }, []);
 
   const onSubmit = async () => {
     // window.alert('Data Successfully Saved')
@@ -174,14 +196,63 @@ function ReceptionistHome() {
 
   // Check Appointment ID
   const checkAppointment = async (ID, e) => {
-    // e.preventDefault("");
     let appointmentID = ID;
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/customer/appointmentId/${appointmentID}`
+      );
+      const result = response.data; // log the string return from the server
+      if (result == "") {
+        toast.error("Incorrect Appointment Number", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "dark",
+        });
+      }
+      // else {
+      //   console.log(result);
+      //   navigate(`/NotTodayAppointment?date=${result.date}`);
+      // }
+      else if (result.date === today) {
+        console.log("today", result);
 
-    if (appointmentID != undefined) {
-      window.alert(appointmentID);
-      const isValid = await landingPageValidation.isValid(appointmentID);
-      // window.alert(isValid)
+        navigate(
+          `/WaitingForAppointment?appointmentNumber=${result.appointmentNumber}&appointmentId=${result.appointmentId}&appointmentTime=${result.appointmentTime}`
+        );
+      } else {
+        // console.log("not today");
+        navigate(`/NotTodayAppointment?date=${result.date}`);
+      }
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  const filterAppointment = async (day, doctorId) => {
+    try {
+      axios
+        .get("http://localhost:8080/customer/loadAppointments", {
+          params: {
+            doctor: doctorId,
+            date: day,
+          },
+        })
+        .then((response) => {
+          console.log(response.data);
+          setAppointments(response.data);
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } catch (error) {
+      console.log(error);
+    }
+    console.log("Appointments", appointments);
   };
 
   return (
@@ -209,19 +280,19 @@ function ReceptionistHome() {
             <Button value="Account" />
           </div>
         </div>
-        <div className="w-[1000px] h-[50px] pl-40  mx-auto ">
+        {/* <div className="w-[1000px] h-[50px] pl-40  mx-auto ">
           <ul className="flex gap-4 ">
             <li>Current</li>
             <li>Check</li>
             <li>Booking Now</li>
             <li>List</li>
           </ul>
-        </div>
+        </div> */}
       </div>
 
       {/* Check Current Appointment Number */}
-      <div className="max-w-[1240px] mx-auto mt-[150px] ">
-        <HeaderBox header="Current Appointment Number" />
+      <div className="max-w-[1000px] mx-auto mt-[100px] ">
+        {/* <HeaderBox header="Current Appointment Number" />
         <div className="bg-white">
           <div className="p-4">
             <ValidatorForm
@@ -271,7 +342,7 @@ function ReceptionistHome() {
               </Grid>
             </ValidatorForm>
           </div>
-        </div>
+        </div> */}
 
         {/* Check Appointments */}
         <HeaderBox header="Check Appointment" />
@@ -650,130 +721,156 @@ function ReceptionistHome() {
           </div>
         </div>
 
-        {/* Bill */}
-        {billHandler === true ? (
-          <div className="w-full h-auto py-10 my-5 bg-box-blue/20">
-            {/* Bill inner box */}
-            <div className="w-[340px] mx-auto py-10 px-8 bg-white font-bold rounded-xl ">
-              {/* Bill items */}
-              <div className="pb-10 border-b border-slate-500  ">
-                <div className="flex justify-between ">
-                  <p className="text-black">Appointment Fee</p>
-                  <p className="text-black">600.00</p>
-                </div>
-                <div className="flex justify-between ">
-                  <p className="text-black">Doctor Fee</p>
-                  <p className="text-black">1700.00</p>
-                </div>
-              </div>
-              {/* Bill total */}
-              <div className="flex justify-between pt-4 pb-4 font-semi-bold text-xl ">
-                <p className="text-black">Total</p>
-                <p className="text-lime-500">2300.00</p>
-              </div>
-              <div className="w-full flex-col justify-between md:my-2 pb-2 ">
-                <p className="text-black font-semibold pb-2">
-                  Check Your E mail and Please Enter the Appointment ID Here
-                </p>
-                <input
-                  name="appointmentId"
-                  type="text"
-                  placeholder="Appointment ID"
-                  className="w-full md:w-[100%]"
-                  onChange={(e) => {
-                    setTempAppointmentId(e.target.value);
-                  }}
-                />
-              </div>
+        <HeaderBox header="Appointments List" />
+        <div className="bg-white">
+          <ValidatorForm
+            className="md:flex w-[90%] m-auto py-4 "
+            // onSubmit={(event) => {
+            //   checkAppointment(id, event);
+            // }}
+            onError={() => null}
+          >
+            <Grid container spacing={2}>
               <Grid
-                className="flex justify-center"
+                className="flex items-center"
                 item
-                lg={12}
-                md={12}
+                lg={2}
+                md={6}
                 sm={12}
                 xs={12}
               >
-                <Button variant="contained" onClick={bookAnAppointment}>
-                  Pay on Door
-                </Button>
+                <p className="text-black">Select Doctor</p>
               </Grid>
-            </div>
-          </div>
-        ) : null}
-
-        {/* Appointment List */}
-        <HeaderBox header="Appointment List" />
-        <div className="w-full h-auto py-20 my-12 bg-box-blue/20 px-2 ">
-          <div className="flex w-full pb-12 ">
-            <div className="w-full p-2">
-              <p className="pb-2 px-4">Select the Doctor</p>
-              <select name="" id="">
-                {DOCTOR_NAMES.map(({ name }) => (
-                  <option value={`${name}`}>{name}</option>
-                ))}
-              </select>
-            </div>
-            <div className="w-full p-2">
-              <p className="pb-2 px-4">Select Date</p>
-              <input type="date" />
-            </div>
-          </div>
-          {/* Inner box */}
-          <div className="w-full mx-auto pt-24 pb-16 px-8 bg-white font-bold rounded-xl ">
-            {/* Bill items */}
-            <div className="pb-16   ">
-              <table className="table-auto w-full border-collapse border border-slate-500 ">
-                <thead>
-                  <th className=" border border-slate-600 bg-slate-400 ">ID</th>
-                  <th className=" border border-slate-600 bg-slate-400 ">
-                    Number
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">
+              <Grid
+                // className="flex items-center"
+                item
+                lg={4}
+                md={6}
+                sm={12}
+                xs={12}
+              >
+                <FormControl fullWidth>
+                  <InputLabel>Select Doctor</InputLabel>
+                  <Select
+                    value={doctor}
+                    label="Doctor"
+                    size="small"
+                    required={true}
+                    // defaultValue={"Male"}
+                    onChange={(e) => {
+                      setDoctorId(e.target.value);
+                      console.log("Key It", e.target.value);
+                      if (date != null) {
+                        filterAppointment(date, e.target.value);
+                      }
+                    }}
+                  >
+                    {allDoctors.map((data) => (
+                      <MenuItem key={data.userId} value={data.userId}>
+                        {data.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid
+                className="flex items-center"
+                item
+                lg={2}
+                md={6}
+                sm={12}
+                xs={12}
+              >
+                <p className="text-black">Select the Date</p>
+              </Grid>
+              <Grid
+                // className="flex items-center"
+                item
+                lg={4}
+                md={6}
+                sm={12}
+                xs={12}
+              >
+                <input
+                  value={date}
+                  className="w-[80%]"
+                  onChange={(e) => {
+                    setDate(e.target.value);
+                    if (doctorId != null) {
+                      filterAppointment(e.target.value, doctorId);
+                    }
+                  }}
+                  type="date"
+                />
+              </Grid>
+            </Grid>
+          </ValidatorForm>
+        </div>
+        {/* Appointments Table */}
+        <div className="w-full mx-auto p-4 px-8 my-2 bg-white font-bold rounded-sm ">
+          <TableContainer component={Paper}>
+            <Table aria-label="collapsible table">
+              <TableBody>
+                <TableRow
+                  sx={{
+                    "& > *": {
+                      borderBottom: "unset",
+                      font: "bold",
+                    },
+                  }}
+                >
+                  <TableCell
+                    className="font-bold"
+                    align="center"
+                    component="th"
+                    scope="row"
+                  >
+                    Appointment ID
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
                     Patient Name
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">NIC</th>
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Gender
-                  </th>
-                  <th className=" border border-slate-600 bg-slate-400">Age</th>
-                  <th className=" border border-slate-600 bg-slate-400">
-                    Mobile Number
-                  </th>
-                </thead>
-                <tbody>
-                  {APPOINTMENT_LIST.map(
-                    ({ id, number, pName, nic, gender, age, mobile }) => (
-                      <tr>
-                        <td className="text-center border border-slate-700">
-                          {id}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {number}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {pName}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {nic}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {gender}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {age}
-                        </td>
-                        <td className="text-center border border-slate-700">
-                          {mobile}
-                        </td>
-                      </tr>
-                    )
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    Age
+                  </TableCell>
+                  <TableCell className="font-bold" align="center">
+                    Type
+                  </TableCell>
+                </TableRow>
+                {appointments.map(
+                  ({ appointmentId, name, age, videoConference }) => (
+                    <TableRow
+                      // onClick={() => setOpen(!open)}
+                      sx={{
+                        "& > *": { borderBottom: "unset", cursor: "pointer" },
+                      }}
+                    >
+                      <TableCell align="center" component="th" scope="row">
+                        {appointmentId}
+                      </TableCell>
+                      <TableCell align="center">{name}</TableCell>
+                      <TableCell align="center">{age}</TableCell>
+                      <TableCell align="center">
+                        {" "}
+                        {videoConference ? "Virtual" : "Physical"}
+                      </TableCell>
+                      <TableCell align="center">
+                        <Button
+                          // onClick={() => createZoomMeetingLink()}
+                          variant="contained"
+                        >
+                          Start
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  )
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </div>
       </div>
+      <ToastContainer />
       <Footer />
     </div>
   );

@@ -8,45 +8,45 @@ import {
   TableRow,
 } from "@mui/material";
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ValidatorForm } from "react-material-ui-form-validator";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import HeaderBox from "../../../../components/HeaderBox";
 import Logo from "../../../../components/Logo";
 import MainButton from "../../../../components/MainButton";
 import Button from "@mui/material/Button";
 import Footer from "../../../../Lib/Footer";
-
-/* Data for Appointments */
-const APPOINTMENT_DETAILS = [
-  {
-    AppointmentID: 1544554,
-    PName: "Pramodya Samarakoon",
-    Gender: "Male",
-    Age: 23,
-    Prescription: "Download",
-  },
-  {
-    AppointmentID: 1544554,
-    PName: "Pramodya Samarakoon",
-    Gender: "Male",
-    Age: 23,
-    Prescription: "Download",
-  },
-  {
-    AppointmentID: 1544554,
-    PName: "Pramodya Samarakoon",
-    Gender: "Male",
-    Age: 23,
-    Prescription: "Download",
-  },
-];
+import { useLocation } from "react-router-dom";
 
 function DoctorHome() {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-  const [doctor, setDoctor] = useState("fbd3c3c3");
+  const [doctor, setDoctor] = useState();
+  const [user, setUser] = useState();
   const [appointments, setAppointments] = useState([]);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const navigate = useNavigate();
+
   // console.log("Date", appointments);
+
+  useEffect(() => {
+    const userId = searchParams.get("userId");
+    setDoctor(userId);
+  }, []);
+
+  useEffect(() => {
+    const userId = searchParams.get("userId");
+    loadUser(userId);
+    console.log("User", doctor);
+  }, [doctor]);
+
+  // Load user
+  const loadUser = async (userId) => {
+    const response = await axios.get(
+      `http://localhost:8080/user/getUser?userId=${userId}`
+    );
+    setUser(response.data);
+  };
 
   // Filtering the appointments when select the date according to the doctor
   const filterAppointment = async (day) => {
@@ -95,6 +95,10 @@ function DoctorHome() {
     }
   };
 
+  const navigateAccount = () => {
+    navigate(`/AccountPage?userId=${doctor}`);
+  };
+
   return (
     <div className="bg-back-blue ">
       {/* <NavBar/> */}
@@ -116,8 +120,13 @@ function DoctorHome() {
               </ul>
             </div>
           </div>
+          <div className="text-[18px] flex ">
+            {user && <p>Welcome Back {user.name}</p>}
+          </div>
           <div>
-            <MainButton value="Account" />
+            <Button onClick={() => navigateAccount()} variant="contained">
+              Account
+            </Button>
           </div>
         </div>
       </div>
